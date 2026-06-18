@@ -6,19 +6,43 @@ import Budget from './components/budget/Budget';
 import Staffing from './components/staffing/Staffing';
 import Inventory from './components/inventory/Inventory';
 import { useGDACS } from './hooks/useGDACS';
-import { REGIONS, WAREHOUSES, BUDGET_CATEGORIES, STAFF_MEMBERS, INITIAL_OPS_LOG } from './data/mockData';
-import type { Module, OpsLogEntry, Region } from './types';
+import { REGIONS, WAREHOUSES, BUDGET_CATEGORIES, STAFF_MEMBERS, INITIAL_OPS_LOG, MOCK_EARTHQUAKE, MOCK_VOLCANO } from './data/mockData';
+import type { Module, OpsLogEntry, Region, ActiveAlert } from './types';
+
+function alertToSignal(alert: ActiveAlert): number {
+  if (alert.type === 'typhoon' || alert.type === 'tropical_storm' || alert.type === 'tropical_depression') {
+    return alert.signalNumber;
+  }
+  if (alert.type === 'earthquake') {
+    const mag = alert.magnitude ?? 0;
+    if (mag >= 7.0) return 4;
+    if (mag >= 6.0) return 3;
+    if (mag >= 5.0) return 2;
+    return 1;
+  }
+  if (alert.type === 'volcanic') {
+    return Math.min(5, alert.volcanoAlertLevel ?? 0) as Region['signal'];
+  }
+  return 1;
+}
 
 export default function App() {
   const [activeModule, setActiveModule] = useState<Module>('disaster');
   const [opsLog, setOpsLog] = useState<OpsLogEntry[]>(INITIAL_OPS_LOG);
-  const { alert, dataSource, loading } = useGDACS();
+  const { alert: gdacsAlert, dataSource, loading } = useGDACS();
 
+  // All active alerts: live GDACS typhoon (if any) + persistent mock EQ + volcano
+  const alerts: ActiveAlert[] = [gdacsAlert, MOCK_EARTHQUAKE, MOCK_VOLCANO];
+
+  // Risk Board: take the max signal each region gets from any active alert
   const regions: Region[] = REGIONS.map(r => {
-    if (alert && alert.affectedRegionIds.includes(r.id)) {
-      return { ...r, signal: Math.max(r.signal, alert.signalNumber) as Region['signal'] };
+    let maxSignal = r.signal;
+    for (const a of alerts) {
+      if (a.affectedRegionIds.includes(r.id)) {
+        maxSignal = Math.max(maxSignal, alertToSignal(a)) as Region['signal'];
+      }
     }
-    return r;
+    return { ...r, signal: maxSignal as Region['signal'] };
   });
 
   function addLog(entry: OpsLogEntry) {
@@ -39,7 +63,7 @@ export default function App() {
         {activeModule === 'disaster' && (
           <DisasterRelief
             warehouses={WAREHOUSES}
-            alert={alert}
+            alerts={alerts}
             regions={regions}
             dataSource={dataSource}
             loading={loading}

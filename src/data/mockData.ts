@@ -141,7 +141,59 @@ export const MOCK_ALERT: ActiveAlert = {
   source: 'mock',
 };
 
+export const MOCK_EARTHQUAKE: ActiveAlert = {
+  id: 'alert-002',
+  name: 'M6.7 Earthquake — Eastern Samar',
+  type: 'earthquake',
+  signalNumber: 0,
+  affectedRegionIds: ['VIII', 'XIII'],
+  affectedProvinces: ['Eastern Samar', 'Leyte', 'Northern Samar', 'Biliran'],
+  coordinates: { lat: 11.85, lng: 125.72 },
+  track: [],
+  intensity: 'PHIVOLCS Intensity VII — Destructive',
+  lastUpdated: '2024-10-24T01:15:00',
+  source: 'mock',
+  magnitude: 6.7,
+  depth: 12,
+  phivolcsIntensity: 'VII',
+};
+
+export const MOCK_VOLCANO: ActiveAlert = {
+  id: 'alert-003',
+  name: 'Mayon Volcano — Alert Level 3',
+  type: 'volcanic',
+  signalNumber: 0,
+  affectedRegionIds: ['V'],
+  affectedProvinces: ['Albay', 'Camarines Sur'],
+  coordinates: { lat: 13.2575, lng: 123.6855 },
+  track: [],
+  intensity: 'High-level unrest · Lava effusion ongoing',
+  lastUpdated: '2024-10-24T00:00:00',
+  source: 'mock',
+  volcanoName: 'Mayon Volcano',
+  volcanoAlertLevel: 3,
+  dangerZoneKm: 6,
+};
+
+export const ALL_MOCK_ALERTS: ActiveAlert[] = [MOCK_ALERT, MOCK_EARTHQUAKE, MOCK_VOLCANO];
+
 export const INITIAL_OPS_LOG: OpsLogEntry[] = [
+  {
+    id: 'log-000a',
+    timestamp: '2024-10-24T01:15:00',
+    type: 'signal_raised',
+    message: 'PHIVOLCS: M6.7 earthquake recorded off Eastern Samar coast. Depth 12 km. Intensity VII in Leyte/Samar. Tsunami watch issued.',
+    level: 'critical',
+    regionId: 'VIII',
+  },
+  {
+    id: 'log-000b',
+    timestamp: '2024-10-24T01:00:00',
+    type: 'signal_raised',
+    message: 'PHIVOLCS raises Mayon Volcano Alert Level to 3. Lava effusion and increased seismic activity. 6 km Permanent Danger Zone enforced.',
+    level: 'critical',
+    regionId: 'V',
+  },
   {
     id: 'log-001',
     timestamp: '2024-10-24T00:30:00',

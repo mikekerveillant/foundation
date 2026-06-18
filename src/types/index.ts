@@ -41,10 +41,12 @@ export interface TyphoonTrackPoint {
   intensity: string;
 }
 
+export type DisasterType = 'typhoon' | 'tropical_storm' | 'tropical_depression' | 'earthquake' | 'volcanic' | 'flood';
+
 export interface ActiveAlert {
   id: string;
   name: string;
-  type: 'typhoon' | 'tropical_storm' | 'tropical_depression' | 'earthquake' | 'flood';
+  type: DisasterType;
   signalNumber: SignalNumber;
   affectedRegionIds: string[];
   affectedProvinces: string[];
@@ -54,6 +56,14 @@ export interface ActiveAlert {
   lastUpdated: string;
   source: 'live' | 'mock';
   gdacsAlertLevel?: 'Green' | 'Orange' | 'Red';
+  // Earthquake-specific
+  magnitude?: number;
+  depth?: number;
+  phivolcsIntensity?: string;
+  // Volcanic-specific
+  volcanoName?: string;
+  volcanoAlertLevel?: 0 | 1 | 2 | 3 | 4 | 5;
+  dangerZoneKm?: number;
 }
 
 export interface OpsLogEntry {
