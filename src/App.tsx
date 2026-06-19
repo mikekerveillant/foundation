@@ -6,7 +6,8 @@ import Budget from './components/budget/Budget';
 import Staffing from './components/staffing/Staffing';
 import Inventory from './components/inventory/Inventory';
 import { useGDACS } from './hooks/useGDACS';
-import { REGIONS, WAREHOUSES, BUDGET_CATEGORIES, STAFF_MEMBERS, INITIAL_OPS_LOG, MOCK_EARTHQUAKE, MOCK_VOLCANO } from './data/mockData';
+import { useUSGSEarthquake } from './hooks/useUSGSEarthquake';
+import { REGIONS, WAREHOUSES, BUDGET_CATEGORIES, STAFF_MEMBERS, INITIAL_OPS_LOG, MOCK_VOLCANO } from './data/mockData';
 import type { Module, OpsLogEntry, Region, ActiveAlert } from './types';
 
 function alertToSignal(alert: ActiveAlert): number {
@@ -30,9 +31,10 @@ export default function App() {
   const [activeModule, setActiveModule] = useState<Module>('disaster');
   const [opsLog, setOpsLog] = useState<OpsLogEntry[]>(INITIAL_OPS_LOG);
   const { alert: gdacsAlert, dataSource, loading } = useGDACS();
+  const { alert: usgsEarthquake } = useUSGSEarthquake();
 
-  // All active alerts: live GDACS typhoon (if any) + persistent mock EQ + volcano
-  const alerts: ActiveAlert[] = [gdacsAlert, MOCK_EARTHQUAKE, MOCK_VOLCANO];
+  // All active alerts: live GDACS typhoon + live USGS earthquake (M≥5.5) + mock volcano
+  const alerts: ActiveAlert[] = [gdacsAlert, usgsEarthquake, MOCK_VOLCANO];
 
   // Risk Board: take the max signal each region gets from any active alert
   const regions: Region[] = REGIONS.map(r => {
