@@ -20,3 +20,15 @@ export function useIsCompact() {
   }, []);
   return v;
 }
+
+// Phone landscape: screen height < 500px (e.g. 375px tall in landscape)
+// Use the same compact map-only layout as portrait mobile
+export function useIsShortScreen() {
+  const [v, setV] = useState(() => window.innerHeight < 500);
+  useEffect(() => {
+    const fn = () => setV(window.innerHeight < 500);
+    window.addEventListener('resize', fn);
+    return () => window.removeEventListener('resize', fn);
+  }, []);
+  return v;
+}
