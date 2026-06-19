@@ -187,7 +187,6 @@ export default function DisasterRelief({ warehouses, alerts, regions, dataSource
       display: 'flex', alignItems: 'center', gap: 0, background: 'var(--bg-surface)',
       borderBottom: '1px solid var(--border)', padding: '0 12px', flexShrink: 0,
       overflowX: 'auto',
-      ...(useCompactLayout ? { position: 'sticky', top: 0, zIndex: 10 } : {}),
     }}>
       {alerts.map((a, idx) => {
         const isActive = idx === selectedAlertIdx;
@@ -249,11 +248,11 @@ export default function DisasterRelief({ warehouses, alerts, regions, dataSource
   // Map fills the screen; warehouse panel hidden to avoid blocking the view
   if (useCompactLayout) {
     return (
-      <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden' }}>
         {tabBar}
         <AlertBanner alert={alert} dataSource={dataSource} loading={loading} compact />
         {eqStrip}
-        <div style={{ flex: 1, overflow: 'hidden' }}>
+        <div style={{ flex: 1, minHeight: 0, overflow: 'hidden' }}>
           <PhilippinesMap
             warehouses={warehouses} alerts={alerts} selectedAlertIdx={selectedAlertIdx}
             regions={regions} selectedWarehouseId={selectedWarehouseId} onWarehouseClick={setSelectedWarehouseId}
