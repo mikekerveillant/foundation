@@ -239,23 +239,25 @@ export default function PhilippinesMap({ warehouses, alerts, selectedAlertIdx, r
             );
           })()}
 
-          {/* ── Volcanic extended ash-fall zone ───────────────────────────── */}
-          {selectedAlert.type === 'volcanic' && (() => {
-            const color = alertColor(selectedAlert);
-            const { coordinates, dangerZoneKm } = selectedAlert;
-            // dangerZoneKm → approx SVG units: 6km ≈ 3 units, 14km ≈ 6 units, 30km ≈ 13 units
+          {/* ── Volcanic extended ash-fall zones (all active volcanoes) ─────── */}
+          {alerts.map((alert, idx) => {
+            if (alert.type !== 'volcanic') return null;
+            const isSel = idx === selectedAlertIdx;
+            const color = alertColor(alert);
+            const { coordinates, dangerZoneKm } = alert;
             const dzR = (dangerZoneKm ?? 6) * 0.5;
+            const op = isSel ? 1 : 0.45;
             return (
-              <Marker coordinates={[coordinates.lng, coordinates.lat]}>
-                {/* Extended ash-fall zone (~30km) */}
-                <circle r={dzR * 5} fill={`${color}07`} stroke={`${color}18`} strokeWidth={0.8} strokeDasharray="5 3" />
-                {/* Caution zone (~14km) */}
-                <circle r={dzR * 2.3} fill={`${color}12`} stroke={`${color}28`} strokeWidth={0.8} />
+              <Marker key={`${alert.id}-zones`} coordinates={[coordinates.lng, coordinates.lat]}>
+                {/* Extended ash-fall zone */}
+                <circle r={dzR * 5}   fill={`${color}07`} stroke={`${color}18`} strokeWidth={0.8} strokeDasharray="5 3" opacity={op} />
+                {/* Caution zone */}
+                <circle r={dzR * 2.3} fill={`${color}12`} stroke={`${color}28`} strokeWidth={0.8} opacity={op} />
                 {/* PDZ permanent danger zone */}
-                <circle r={dzR} fill={`${color}22`} stroke={`${color}60`} strokeWidth={1} strokeDasharray="2 1" />
+                <circle r={dzR}       fill={`${color}22`} stroke={`${color}60`} strokeWidth={1}   strokeDasharray="2 1" opacity={op} />
               </Marker>
             );
-          })()}
+          })}
 
           {/* ── Typhoon track lines ────────────────────────────────────────── */}
           {alerts.map(alert => {

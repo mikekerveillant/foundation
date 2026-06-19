@@ -168,12 +168,46 @@ export const MOCK_VOLCANO: ActiveAlert = {
   affectedProvinces: ['Albay', 'Camarines Sur'],
   coordinates: { lat: 13.2575, lng: 123.6855 },
   track: [],
-  intensity: 'High-level unrest · Lava effusion ongoing',
+  intensity: 'Explosive / Effusive · eruption ongoing since 2026 Jan 6',
   lastUpdated: '2024-10-24T00:00:00',
   source: 'mock',
   volcanoName: 'Mayon Volcano',
   volcanoAlertLevel: 3,
   dangerZoneKm: 6,
+};
+
+export const MOCK_KANLAON: ActiveAlert = {
+  id: 'alert-004',
+  name: 'Kanlaon Volcano — Alert Level 3',
+  type: 'volcanic',
+  signalNumber: 0,
+  affectedRegionIds: ['VI'],
+  affectedProvinces: ['Negros Occidental', 'Negros Oriental'],
+  coordinates: { lat: 10.4120, lng: 123.1320 },
+  track: [],
+  intensity: 'Explosive / Effusive · eruption ongoing since 2024 Oct 19',
+  lastUpdated: '2024-10-24T00:00:00',
+  source: 'mock',
+  volcanoName: 'Kanlaon Volcano',
+  volcanoAlertLevel: 3,
+  dangerZoneKm: 4,
+};
+
+export const MOCK_TAAL: ActiveAlert = {
+  id: 'alert-005',
+  name: 'Taal Volcano — Alert Level 3',
+  type: 'volcanic',
+  signalNumber: 0,
+  affectedRegionIds: ['IVA'],
+  affectedProvinces: ['Batangas', 'Cavite'],
+  coordinates: { lat: 14.0023, lng: 120.9900 },
+  track: [],
+  intensity: 'Explosive / Effusive · eruption ongoing since 2024 Apr 12',
+  lastUpdated: '2024-10-24T00:00:00',
+  source: 'mock',
+  volcanoName: 'Taal Volcano',
+  volcanoAlertLevel: 3,
+  dangerZoneKm: 14,
 };
 
 export const ALL_MOCK_ALERTS: ActiveAlert[] = [MOCK_ALERT, MOCK_EARTHQUAKE, MOCK_VOLCANO];
