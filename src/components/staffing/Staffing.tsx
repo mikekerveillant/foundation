@@ -85,7 +85,7 @@ export default function Staffing({ staff, warehouses }: Props) {
               </span>
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fill, minmax(280px, 1fr))', gap: 1, background: 'var(--border)' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: isMobile ? 'minmax(0,1fr)' : 'repeat(auto-fill, minmax(280px, 1fr))', gap: 1, background: 'var(--border)' }}>
               {members.map(member => {
                 const wh = nearestWarehouse(member);
                 const roleColor = ROLE_COLORS[member.role] || 'var(--text-muted)';

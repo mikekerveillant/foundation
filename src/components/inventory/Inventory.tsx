@@ -90,7 +90,7 @@ export default function Inventory({ warehouses }: Props) {
         <div style={{ fontFamily: 'var(--font-display)', fontSize: 13, fontWeight: 600, color: 'var(--text-primary)', letterSpacing: '0.04em', marginBottom: 14 }}>
           NETWORK TOTALS
         </div>
-        <div style={{ display: 'grid', gridTemplateColumns: isMobile ? 'repeat(3, 1fr)' : 'repeat(5, 1fr)', gap: isMobile ? 12 : 16 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: isMobile ? 'repeat(3, minmax(0,1fr))' : 'repeat(5, 1fr)', gap: isMobile ? 12 : 16 }}>
           {(Object.entries(CAT_LABELS) as [keyof typeof CAT_ICONS, string][]).map(([cat, label]) => {
             const Icon = CAT_ICONS[cat];
             const total = totals[cat] ?? 0;
@@ -113,7 +113,7 @@ export default function Inventory({ warehouses }: Props) {
       </div>
 
       {/* Per-warehouse */}
-      <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fill, minmax(440px, 1fr))', gap: 14 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: isMobile ? 'minmax(0,1fr)' : 'repeat(auto-fill, minmax(440px, 1fr))', gap: 14 }}>
         {warehouses.map(wh => {
           const hasLow = (Object.values(wh.inventory) as { qty: number; threshold: number }[]).some(v => v.qty < v.threshold * 1.2);
           return (
@@ -135,7 +135,7 @@ export default function Inventory({ warehouses }: Props) {
                         <Icon size={11} color={color} strokeWidth={1.5} />
                         <span style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--text-secondary)', flex: 1 }}>{CAT_LABELS[cat]}</span>
                         <span style={{ fontFamily: 'var(--font-mono)', fontSize: 9, color, background: color === 'var(--sage)' ? 'var(--sage-dim)' : color === 'var(--amber)' ? 'var(--amber-dim)' : 'var(--red-dim)', border: `1px solid ${color === 'var(--sage)' ? 'var(--sage-border)' : color === 'var(--amber)' ? 'var(--amber-border)' : 'var(--red-border)'}`, padding: '1px 5px', borderRadius: 3, letterSpacing: '0.06em' }}>{label}</span>
-                        <span style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--text-primary)', minWidth: 70, textAlign: 'right' }}>{fmt(val.qty)} {CAT_UNITS[cat]}</span>
+                        <span style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--text-primary)', textAlign: 'right' }}>{fmt(val.qty)} {CAT_UNITS[cat]}</span>
                       </div>
                       <div className="progress-bar" style={{ height: 4 }}>
                         <div className="progress-fill" style={{ width: `${Math.min(pct * 100, 100)}%`, background: color }} />
