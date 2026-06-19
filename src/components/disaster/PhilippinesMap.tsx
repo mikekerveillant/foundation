@@ -45,7 +45,7 @@ function signalToStrokeOpacity(signal: number): number {
 }
 
 function alertColor(alert: ActiveAlert): string {
-  if (alert.type === 'typhoon' || alert.type === 'tropical_storm') return SIGNAL_COLOR[alert.signalNumber];
+  if (alert.type === 'typhoon' || alert.type === 'tropical_storm' || alert.type === 'tropical_depression') return SIGNAL_COLOR[alert.signalNumber];
   if (alert.type === 'earthquake') {
     const m = alert.magnitude ?? 0;
     return m >= 7 ? '#C84B31' : m >= 6 ? '#E8901C' : '#D4791A';
@@ -61,7 +61,7 @@ function stockColor(qty: number, threshold: number) {
 
 // Derive a 0-5 "signal equivalent" from any alert type for unified risk zone sizing
 function alertRegionSignal(alert: ActiveAlert, regionId: string, regions: Region[]): number {
-  if (alert.type === 'typhoon' || alert.type === 'tropical_storm') {
+  if (alert.type === 'typhoon' || alert.type === 'tropical_storm' || alert.type === 'tropical_depression') {
     return regions.find(r => r.id === regionId)?.signal ?? alert.signalNumber;
   }
   if (alert.type === 'earthquake') {
@@ -92,7 +92,7 @@ export default function PhilippinesMap({ warehouses, alerts, selectedAlertIdx, r
 
   // Determine hazard key for label lookup
   const hazardKey: 'typhoon' | 'earthquake' | 'volcanic' | null =
-    selectedAlert.type === 'typhoon' || selectedAlert.type === 'tropical_storm' ? 'typhoon'
+    selectedAlert.type === 'typhoon' || selectedAlert.type === 'tropical_storm' || selectedAlert.type === 'tropical_depression' ? 'typhoon'
     : selectedAlert.type === 'earthquake' ? 'earthquake'
     : selectedAlert.type === 'volcanic' ? 'volcanic'
     : null;
@@ -261,7 +261,7 @@ export default function PhilippinesMap({ warehouses, alerts, selectedAlertIdx, r
 
           {/* ── Typhoon track lines ────────────────────────────────────────── */}
           {alerts.map(alert => {
-            if ((alert.type !== 'typhoon' && alert.type !== 'tropical_storm') || alert.track.length < 2) return null;
+            if ((alert.type !== 'typhoon' && alert.type !== 'tropical_storm' && alert.type !== 'tropical_depression') || alert.track.length < 2) return null;
             const isSelected = alerts.indexOf(alert) === selectedAlertIdx;
             const color = alertColor(alert);
             return alert.track.slice(0, -1).map((pt, i) => {
@@ -281,7 +281,7 @@ export default function PhilippinesMap({ warehouses, alerts, selectedAlertIdx, r
 
           {/* Typhoon track dots */}
           {alerts.map(alert => {
-            if (alert.type !== 'typhoon' && alert.type !== 'tropical_storm') return null;
+            if (alert.type !== 'typhoon' && alert.type !== 'tropical_storm' && alert.type !== 'tropical_depression') return null;
             const color = alertColor(alert);
             return alert.track.map((pt, i) => (
               <Marker key={`${alert.id}-dot-${i}`} coordinates={[pt.lng, pt.lat]}>
@@ -296,7 +296,7 @@ export default function PhilippinesMap({ warehouses, alerts, selectedAlertIdx, r
 
           {/* Typhoon eye */}
           {alerts.map((alert, idx) => {
-            if (alert.type !== 'typhoon' && alert.type !== 'tropical_storm') return null;
+            if (alert.type !== 'typhoon' && alert.type !== 'tropical_storm' && alert.type !== 'tropical_depression') return null;
             const color = alertColor(alert);
             const isSel = idx === selectedAlertIdx;
             return (
