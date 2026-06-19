@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import type { ActiveAlert } from '../types';
-import { MOCK_VOLCANO } from '../data/mockData';
+import { MOCK_VOLCANO, MOCK_KANLAON, MOCK_TAAL } from '../data/mockData';
+
+const MOCK_VOLCANOS = [MOCK_VOLCANO, MOCK_KANLAON, MOCK_TAAL];
 
 interface GVPResponse {
   volcanos: ActiveAlert[];
@@ -8,7 +10,7 @@ interface GVPResponse {
 }
 
 export function useVolcanos() {
-  const [volcanos, setVolcanos] = useState<ActiveAlert[]>([MOCK_VOLCANO]);
+  const [volcanos, setVolcanos] = useState<ActiveAlert[]>(MOCK_VOLCANOS);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
