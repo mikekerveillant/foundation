@@ -68,7 +68,7 @@ export default function Budget({ categories }: Props) {
   const pad = isMobile ? '16px 14px' : '24px 28px';
 
   return (
-    <div style={{ height: '100%', overflow: 'auto', padding: pad, background: 'var(--bg-base)' }}>
+    <div style={{ height: '100%', overflowY: 'auto', overflowX: 'hidden', padding: pad, background: 'var(--bg-base)' }}>
       {/* Header */}
       <div style={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row', alignItems: isMobile ? 'flex-start' : 'flex-end', justifyContent: 'space-between', gap: 12, marginBottom: isMobile ? 16 : 28 }}>
         <div>
