@@ -33,9 +33,9 @@ export default function Staffing({ staff, warehouses }: Props) {
   const pad = isMobile ? '16px 14px' : '24px 28px';
 
   return (
-    <div style={{ height: '100%', overflowY: 'auto', overflowX: 'hidden', padding: pad, background: 'var(--bg-base)' }}>
+    <div className="mod" style={{ height: '100%', overflowY: 'auto', overflowX: 'hidden', padding: pad, background: 'var(--bg-base)' }}>
       {/* Header */}
-      <div style={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row', alignItems: isMobile ? 'flex-start' : 'flex-end', justifyContent: 'space-between', gap: 12, marginBottom: isMobile ? 16 : 28 }}>
+      <div style={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row', alignItems: isMobile ? 'flex-start' : 'flex-end', justifyContent: 'space-between', gap: 12, marginBottom: isMobile ? 16 : 28 }} className="mod-header">
         <div>
           <div style={{ fontFamily: 'var(--font-display)', fontSize: isMobile ? 22 : 28, fontWeight: 700, color: 'var(--text-primary)', letterSpacing: '0.02em' }}>
             Staff Roster
@@ -85,7 +85,7 @@ export default function Staffing({ staff, warehouses }: Props) {
               </span>
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: isMobile ? 'minmax(0,1fr)' : 'repeat(auto-fill, minmax(280px, 1fr))', gap: 1, background: 'var(--border)' }}>
+            <div className="mod-grid" style={{ display: 'grid', gridTemplateColumns: isMobile ? 'minmax(0,1fr)' : 'repeat(auto-fill, minmax(280px, 1fr))', gap: 1, background: 'var(--border)' }}>
               {members.map(member => {
                 const wh = nearestWarehouse(member);
                 const roleColor = ROLE_COLORS[member.role] || 'var(--text-muted)';

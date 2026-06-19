@@ -68,18 +68,18 @@ export default function Budget({ categories }: Props) {
   const pad = isMobile ? '16px 14px' : '24px 28px';
 
   return (
-    <div style={{ height: '100%', overflowY: 'auto', overflowX: 'hidden', padding: pad, background: 'var(--bg-base)' }}>
+    <div className="mod" style={{ height: '100%', overflowY: 'auto', overflowX: 'hidden', padding: pad, background: 'var(--bg-base)' }}>
       {/* Header */}
-      <div style={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row', alignItems: isMobile ? 'flex-start' : 'flex-end', justifyContent: 'space-between', gap: 12, marginBottom: isMobile ? 16 : 28 }}>
+      <div style={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row', alignItems: isMobile ? 'flex-start' : 'flex-end', justifyContent: 'space-between', gap: 12, marginBottom: isMobile ? 16 : 28 }} className="mod-header">
         <div>
-          <div style={{ fontFamily: 'var(--font-display)', fontSize: isMobile ? 22 : 28, fontWeight: 700, color: 'var(--text-primary)', letterSpacing: '0.02em', lineHeight: 1 }}>
+          <div style={{ fontFamily: 'var(--font-display)', fontSize: isMobile ? 22 : 28, fontWeight: 700, color: 'var(--text-primary)', letterSpacing: '0.02em', lineHeight: 1 }} className="mod-header-title">
             FY 2024 Budget
           </div>
           <div style={{ fontFamily: 'var(--font-mono)', fontSize: 10, color: 'var(--text-muted)', marginTop: 6, letterSpacing: '0.06em' }}>
             PHILIPPINE PESO · JAN – DEC 2024 · AS OF OCT 2024
           </div>
         </div>
-        <div style={{ display: 'flex', gap: isMobile ? 16 : 20, flexWrap: 'wrap' }}>
+        <div className="mod-header-metrics" style={{ display: 'flex', gap: isMobile ? 16 : 20, flexWrap: 'wrap' }}>
           {[
             { label: 'Annual Budget', value: php(totalBudget), color: 'var(--text-secondary)' },
             { label: 'Spent (YTD)', value: php(totalSpent), color: 'var(--amber)' },
@@ -112,7 +112,7 @@ export default function Budget({ categories }: Props) {
       </div>
 
       {/* Charts */}
-      <div style={{ display: 'grid', gridTemplateColumns: isMobile ? 'minmax(0,1fr)' : '1fr 1fr', gap: 16, marginBottom: 16 }}>
+      <div className="mod-grid" style={{ display: 'grid', gridTemplateColumns: isMobile ? 'minmax(0,1fr)' : '1fr 1fr', gap: 16, marginBottom: 16 }}>
         {/* Burn-down */}
         <div style={{ background: 'var(--bg-surface)', border: '1px solid var(--border)', borderRadius: 8, padding: '16px 16px 10px', minWidth: 0, overflow: 'hidden' }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
@@ -173,7 +173,7 @@ export default function Budget({ categories }: Props) {
               <div key={cat.id} style={{ padding: '12px 0', borderBottom: idx < categories.length - 1 ? '1px solid var(--border)' : 'none' }}>
                 {isMobile ? (
                   // Mobile: two rows — name+pill, then numbers
-                  <>
+                  <div className="mod-cat-mobile" style={{ display: 'flex', flexDirection: 'column' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
                       <div style={{ width: 9, height: 9, borderRadius: 2, background: cat.color, flexShrink: 0 }} />
                       <div style={{ fontFamily: 'var(--font-display)', fontSize: 14, fontWeight: 600, color: 'var(--text-primary)', flex: 1 }}>{cat.name}</div>
@@ -181,15 +181,15 @@ export default function Budget({ categories }: Props) {
                         {statusLabel}
                       </span>
                     </div>
-                    <div style={{ display: 'flex', alignItems: 'baseline', gap: 6, marginBottom: 8 }}>
+                    <div style={{ display: 'flex', alignItems: 'baseline', gap: 6, marginBottom: 8, flexWrap: 'wrap' }}>
                       <span style={{ fontFamily: 'var(--font-mono)', fontSize: 13, color: 'var(--text-primary)' }}>{phpFull(cat.spent)}</span>
                       <span style={{ fontFamily: 'var(--font-mono)', fontSize: 10, color: 'var(--text-muted)' }}>/ {phpFull(cat.annualBudget)}</span>
                       <span style={{ fontFamily: 'var(--font-mono)', fontSize: 13, color, marginLeft: 'auto' }}>{(pct * 100).toFixed(0)}%</span>
                     </div>
-                  </>
+                  </div>
                 ) : (
                   // Desktop: single row
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 10 }}>
+                  <div className="mod-cat-desktop" style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 10 }}>
                     <div style={{ width: 10, height: 10, borderRadius: 2, background: cat.color, flexShrink: 0 }} />
                     <div style={{ fontFamily: 'var(--font-display)', fontSize: 15, fontWeight: 600, color: 'var(--text-primary)', flex: 1, letterSpacing: '0.01em' }}>{cat.name}</div>
                     <span style={{ fontFamily: 'var(--font-mono)', fontSize: 9, color, background: `${color === 'var(--amber)' ? 'var(--amber-dim)' : color === 'var(--blue)' ? 'var(--blue-dim)' : 'var(--sage-dim)'}`, border: `1px solid ${color === 'var(--amber)' ? 'var(--amber-border)' : color === 'var(--blue)' ? 'var(--blue-border)' : 'var(--sage-border)'}`, padding: '2px 7px', borderRadius: 3, letterSpacing: '0.08em' }}>{statusLabel}</span>

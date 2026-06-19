@@ -236,3 +236,24 @@ body {
     overflow-x: hidden;
   }
 }
+
+/* ── Module responsive layout via CSS classes ────────────────────────────
+   Applied at 900px so ALL phone sizes get the narrow layout regardless
+   of whether JS hooks fire correctly. Overrides inline styles.        */
+@media (max-width: 900px) {
+  .mod { padding: 16px 14px !important; overflow-x: hidden !important; }
+  .mod-header { flex-direction: column !important; align-items: flex-start !important; gap: 12px !important; margin-bottom: 16px !important; }
+  .mod-header-title { font-size: 22px !important; }
+  .mod-header-metrics { flex-wrap: wrap !important; gap: 12px !important; }
+  .mod-header-metric { text-align: left !important; }
+  .mod-header-value  { font-size: 16px !important; }
+  .mod-grid   { grid-template-columns: minmax(0,1fr) !important; }
+  .mod-grid-3 { grid-template-columns: repeat(3, minmax(0,1fr)) !important; }
+  .mod-cat-desktop { display: none !important; }
+  .mod-cat-mobile  { display: flex !important; }
+  .recharts-wrapper { max-width: 100% !important; overflow: hidden !important; }
+  .recharts-wrapper svg { max-width: 100% !important; }
+}
+@media (min-width: 901px) {
+  .mod-cat-mobile { display: none !important; }
+}

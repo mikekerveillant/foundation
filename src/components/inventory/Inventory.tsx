@@ -42,9 +42,9 @@ export default function Inventory({ warehouses }: Props) {
   const pad = isMobile ? '16px 14px' : '24px 28px';
 
   return (
-    <div style={{ height: '100%', overflowY: 'auto', overflowX: 'hidden', padding: pad, background: 'var(--bg-base)' }}>
+    <div className="mod" style={{ height: '100%', overflowY: 'auto', overflowX: 'hidden', padding: pad, background: 'var(--bg-base)' }}>
       {/* Header */}
-      <div style={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row', alignItems: isMobile ? 'flex-start' : 'flex-end', justifyContent: 'space-between', gap: 12, marginBottom: isMobile ? 16 : 28 }}>
+      <div style={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row', alignItems: isMobile ? 'flex-start' : 'flex-end', justifyContent: 'space-between', gap: 12, marginBottom: isMobile ? 16 : 28 }} className="mod-header">
         <div>
           <div style={{ fontFamily: 'var(--font-display)', fontSize: isMobile ? 22 : 28, fontWeight: 700, color: 'var(--text-primary)', letterSpacing: '0.02em' }}>
             Inventory
@@ -90,7 +90,7 @@ export default function Inventory({ warehouses }: Props) {
         <div style={{ fontFamily: 'var(--font-display)', fontSize: 13, fontWeight: 600, color: 'var(--text-primary)', letterSpacing: '0.04em', marginBottom: 14 }}>
           NETWORK TOTALS
         </div>
-        <div style={{ display: 'grid', gridTemplateColumns: isMobile ? 'repeat(3, minmax(0,1fr))' : 'repeat(5, 1fr)', gap: isMobile ? 12 : 16 }}>
+        <div className="mod-grid-3" style={{ display: 'grid', gridTemplateColumns: isMobile ? 'repeat(3, minmax(0,1fr))' : 'repeat(5, 1fr)', gap: isMobile ? 12 : 16 }}>
           {(Object.entries(CAT_LABELS) as [keyof typeof CAT_ICONS, string][]).map(([cat, label]) => {
             const Icon = CAT_ICONS[cat];
             const total = totals[cat] ?? 0;
@@ -113,7 +113,7 @@ export default function Inventory({ warehouses }: Props) {
       </div>
 
       {/* Per-warehouse */}
-      <div style={{ display: 'grid', gridTemplateColumns: isMobile ? 'minmax(0,1fr)' : 'repeat(auto-fill, minmax(440px, 1fr))', gap: 14 }}>
+      <div className="mod-grid" style={{ display: 'grid', gridTemplateColumns: isMobile ? 'minmax(0,1fr)' : 'repeat(auto-fill, minmax(440px, 1fr))', gap: 14 }}>
         {warehouses.map(wh => {
           const hasLow = (Object.values(wh.inventory) as { qty: number; threshold: number }[]).some(v => v.qty < v.threshold * 1.2);
           return (
