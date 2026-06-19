@@ -2,7 +2,7 @@ import { format, parseISO } from 'date-fns';
 import { ComposableMap, Geographies, Geography, Marker, ZoomableGroup, Line } from 'react-simple-maps';
 import type { Warehouse, ActiveAlert, Region } from '../../types';
 
-const GEO_URL = 'https://cdn.jsdelivr.net/npm/world-atlas@2/countries-10m.json';
+const GEO_URL = '/countries-50m.json';
 
 // ── constants ─────────────────────────────────────────────────────────────────
 
