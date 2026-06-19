@@ -1,3 +1,4 @@
+import { format, parseISO } from 'date-fns';
 import { ComposableMap, Geographies, Geography, Marker, ZoomableGroup, Line } from 'react-simple-maps';
 import type { Warehouse, ActiveAlert, Region } from '../../types';
 
@@ -279,19 +280,49 @@ export default function PhilippinesMap({ warehouses, alerts, selectedAlertIdx, r
             });
           })}
 
-          {/* Typhoon track dots */}
+          {/* Typhoon track dots + labels */}
           {alerts.map(alert => {
             if (alert.type !== 'typhoon' && alert.type !== 'tropical_storm' && alert.type !== 'tropical_depression') return null;
+            const isSelected = alerts.indexOf(alert) === selectedAlertIdx;
             const color = alertColor(alert);
-            return alert.track.map((pt, i) => (
-              <Marker key={`${alert.id}-dot-${i}`} coordinates={[pt.lng, pt.lat]}>
-                <circle r={i === alert.track.length - 1 ? 5 : 2.5}
-                  fill={i === alert.track.length - 1 ? color : `${color}60`}
-                  stroke={i === alert.track.length - 1 ? '#11161D' : 'transparent'}
-                  strokeWidth={1.5}
-                />
-              </Marker>
-            ));
+            return alert.track.map((pt, i) => {
+              const isLast = i === alert.track.length - 1;
+              const dt = parseISO(pt.time);
+              const dateLabel = format(dt, 'MMM d');
+              const timeLabel = format(dt, 'HH:mm') + 'Z';
+              const windLabel = pt.windKt ? `${pt.windKt}kt · ${Math.round(pt.windKt * 1.852)}km/h` : pt.intensity;
+              return (
+                <Marker key={`${alert.id}-dot-${i}`} coordinates={[pt.lng, pt.lat]}>
+                  {isSelected && (
+                    <>
+                      <rect x={-22} y={-22} width={44} height={10} rx={2} fill="rgba(14,20,25,0.82)" />
+                      <text textAnchor="middle" y={-14}
+                        style={{ fontFamily: "'JetBrains Mono',monospace", fontSize: 6.5, fill: color, fontWeight: 700, letterSpacing: '0.04em', pointerEvents: 'none' }}>
+                        {windLabel}
+                      </text>
+                    </>
+                  )}
+                  <circle r={isLast ? 5 : 3}
+                    fill={isLast ? color : `${color}70`}
+                    stroke={isLast ? '#11161D' : `${color}40`}
+                    strokeWidth={isLast ? 1.5 : 1}
+                  />
+                  {isSelected && (
+                    <>
+                      <rect x={-18} y={8} width={36} height={16} rx={2} fill="rgba(14,20,25,0.82)" />
+                      <text textAnchor="middle" y={16}
+                        style={{ fontFamily: "'JetBrains Mono',monospace", fontSize: 6.5, fill: 'var(--text-secondary)', letterSpacing: '0.04em', pointerEvents: 'none' }}>
+                        {dateLabel}
+                      </text>
+                      <text textAnchor="middle" y={23}
+                        style={{ fontFamily: "'JetBrains Mono',monospace", fontSize: 6, fill: 'var(--text-muted)', letterSpacing: '0.04em', pointerEvents: 'none' }}>
+                        {timeLabel}
+                      </text>
+                    </>
+                  )}
+                </Marker>
+              );
+            });
           })}
 
           {/* Typhoon eye */}

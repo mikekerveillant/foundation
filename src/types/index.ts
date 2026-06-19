@@ -39,6 +39,7 @@ export interface TyphoonTrackPoint {
   lng: number;
   time: string;
   intensity: string;
+  windKt?: number;
 }
 
 export type DisasterType = 'typhoon' | 'tropical_storm' | 'tropical_depression' | 'earthquake' | 'volcanic' | 'flood';

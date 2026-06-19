@@ -78,6 +78,7 @@ function parseTCW(tcw: string): {
       lng,
       time: new Date(issueTime.getTime() + hoursOffset * 3600_000).toISOString(),
       intensity: ktsToIntensity(kts),
+      windKt: kts,
     });
   }
 
