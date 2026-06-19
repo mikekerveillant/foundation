@@ -5,7 +5,7 @@ import DisasterRelief from './components/disaster/DisasterRelief';
 import Budget from './components/budget/Budget';
 import Staffing from './components/staffing/Staffing';
 import Inventory from './components/inventory/Inventory';
-import { useGDACS } from './hooks/useGDACS';
+import { useJTWC } from './hooks/useJTWC';
 import { useUSGSEarthquake } from './hooks/useUSGSEarthquake';
 import { useVolcanos } from './hooks/useVolcanos';
 import { REGIONS, WAREHOUSES, BUDGET_CATEGORIES, STAFF_MEMBERS, INITIAL_OPS_LOG } from './data/mockData';
@@ -31,12 +31,12 @@ function alertToSignal(alert: ActiveAlert): number {
 export default function App() {
   const [activeModule, setActiveModule] = useState<Module>('disaster');
   const [opsLog, setOpsLog] = useState<OpsLogEntry[]>(INITIAL_OPS_LOG);
-  const { alert: gdacsAlert, dataSource, loading } = useGDACS();
+  const { alert: jtwcAlert, dataSource, loading } = useJTWC();
   const { alert: usgsEarthquake } = useUSGSEarthquake();
   const { volcanos } = useVolcanos();
 
-  // All active alerts: live GDACS typhoon + live USGS earthquake (M≥5.5) + live GVP volcanos
-  const alerts: ActiveAlert[] = [gdacsAlert, usgsEarthquake, ...volcanos];
+  // All active alerts: live JTWC typhoon + live USGS earthquake (M≥5.5) + live GVP volcanos
+  const alerts: ActiveAlert[] = [jtwcAlert, usgsEarthquake, ...volcanos];
 
   // Risk Board: take the max signal each region gets from any active alert
   const regions: Region[] = REGIONS.map(r => {
