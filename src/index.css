@@ -251,8 +251,6 @@ body {
   .mod-grid-3 { grid-template-columns: repeat(3, minmax(0,1fr)) !important; }
   .mod-cat-desktop { display: none !important; }
   .mod-cat-mobile  { display: flex !important; }
-  .recharts-wrapper { max-width: 100% !important; overflow: hidden !important; }
-  .recharts-wrapper svg { max-width: 100% !important; }
 }
 @media (min-width: 901px) {
   .mod-cat-mobile { display: none !important; }

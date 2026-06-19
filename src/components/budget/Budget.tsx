@@ -171,33 +171,16 @@ export default function Budget({ categories }: Props) {
 
             return (
               <div key={cat.id} style={{ padding: '12px 0', borderBottom: idx < categories.length - 1 ? '1px solid var(--border)' : 'none' }}>
-                {isMobile ? (
-                  // Mobile: two rows — name+pill, then numbers
-                  <div className="mod-cat-mobile" style={{ display: 'flex', flexDirection: 'column' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
-                      <div style={{ width: 9, height: 9, borderRadius: 2, background: cat.color, flexShrink: 0 }} />
-                      <div style={{ fontFamily: 'var(--font-display)', fontSize: 14, fontWeight: 600, color: 'var(--text-primary)', flex: 1 }}>{cat.name}</div>
-                      <span style={{ fontFamily: 'var(--font-mono)', fontSize: 8, color, background: `${color === 'var(--amber)' ? 'var(--amber-dim)' : color === 'var(--blue)' ? 'var(--blue-dim)' : 'var(--sage-dim)'}`, border: `1px solid ${color === 'var(--amber)' ? 'var(--amber-border)' : color === 'var(--blue)' ? 'var(--blue-border)' : 'var(--sage-border)'}`, padding: '2px 6px', borderRadius: 3, letterSpacing: '0.06em', flexShrink: 0 }}>
-                        {statusLabel}
-                      </span>
-                    </div>
-                    <div style={{ display: 'flex', alignItems: 'baseline', gap: 6, marginBottom: 8, flexWrap: 'wrap' }}>
-                      <span style={{ fontFamily: 'var(--font-mono)', fontSize: 13, color: 'var(--text-primary)' }}>{phpFull(cat.spent)}</span>
-                      <span style={{ fontFamily: 'var(--font-mono)', fontSize: 10, color: 'var(--text-muted)' }}>/ {phpFull(cat.annualBudget)}</span>
-                      <span style={{ fontFamily: 'var(--font-mono)', fontSize: 13, color, marginLeft: 'auto' }}>{(pct * 100).toFixed(0)}%</span>
-                    </div>
-                  </div>
-                ) : (
-                  // Desktop: single row
-                  <div className="mod-cat-desktop" style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 10 }}>
-                    <div style={{ width: 10, height: 10, borderRadius: 2, background: cat.color, flexShrink: 0 }} />
-                    <div style={{ fontFamily: 'var(--font-display)', fontSize: 15, fontWeight: 600, color: 'var(--text-primary)', flex: 1, letterSpacing: '0.01em' }}>{cat.name}</div>
-                    <span style={{ fontFamily: 'var(--font-mono)', fontSize: 9, color, background: `${color === 'var(--amber)' ? 'var(--amber-dim)' : color === 'var(--blue)' ? 'var(--blue-dim)' : 'var(--sage-dim)'}`, border: `1px solid ${color === 'var(--amber)' ? 'var(--amber-border)' : color === 'var(--blue)' ? 'var(--blue-border)' : 'var(--sage-border)'}`, padding: '2px 7px', borderRadius: 3, letterSpacing: '0.08em' }}>{statusLabel}</span>
-                    <div style={{ fontFamily: 'var(--font-mono)', fontSize: 13, color: 'var(--text-primary)', textAlign: 'right', minWidth: 80 }}>{phpFull(cat.spent)}</div>
-                    <div style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--text-muted)', minWidth: 70, textAlign: 'right' }}>/ {phpFull(cat.annualBudget)}</div>
-                    <div style={{ fontFamily: 'var(--font-mono)', fontSize: 13, color, minWidth: 44, textAlign: 'right' }}>{(pct * 100).toFixed(0)}%</div>
-                  </div>
-                )}
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
+                  <div style={{ width: 9, height: 9, borderRadius: 2, background: cat.color, flexShrink: 0 }} />
+                  <div style={{ fontFamily: 'var(--font-display)', fontSize: 14, fontWeight: 600, color: 'var(--text-primary)', flex: 1, minWidth: 0 }}>{cat.name}</div>
+                  <span style={{ fontFamily: 'var(--font-mono)', fontSize: 8, color, background: `${color === 'var(--amber)' ? 'var(--amber-dim)' : color === 'var(--blue)' ? 'var(--blue-dim)' : 'var(--sage-dim)'}`, border: `1px solid ${color === 'var(--amber)' ? 'var(--amber-border)' : color === 'var(--blue)' ? 'var(--blue-border)' : 'var(--sage-border)'}`, padding: '2px 6px', borderRadius: 3, letterSpacing: '0.06em', flexShrink: 0 }}>{statusLabel}</span>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'baseline', gap: 6, marginBottom: 8, flexWrap: 'wrap' }}>
+                  <span style={{ fontFamily: 'var(--font-mono)', fontSize: 13, color: 'var(--text-primary)' }}>{phpFull(cat.spent)}</span>
+                  <span style={{ fontFamily: 'var(--font-mono)', fontSize: 10, color: 'var(--text-muted)' }}>/ {phpFull(cat.annualBudget)}</span>
+                  <span style={{ fontFamily: 'var(--font-mono)', fontSize: 13, color, marginLeft: 'auto' }}>{(pct * 100).toFixed(0)}%</span>
+                </div>
                 <div className="progress-bar" style={{ height: 5 }}>
                   <div className="progress-fill" style={{ width: `${Math.min(pct * 100, 100)}%`, background: color }} />
                 </div>
