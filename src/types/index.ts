@@ -60,6 +60,7 @@ export interface ActiveAlert {
   magnitude?: number;
   depth?: number;
   phivolcsIntensity?: string;
+  occurredAt?: string;
   // Volcanic-specific
   volcanoName?: string;
   volcanoAlertLevel?: 0 | 1 | 2 | 3 | 4 | 5;

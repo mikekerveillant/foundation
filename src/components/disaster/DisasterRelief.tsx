@@ -1,8 +1,10 @@
 import { useState } from 'react';
-import { Wifi, WifiOff, AlertOctagon, Waves, Flame } from 'lucide-react';
+import { format, parseISO } from 'date-fns';
+import { Wifi, WifiOff, AlertOctagon, Waves, Flame, Clock } from 'lucide-react';
 import PhilippinesMap from './PhilippinesMap';
 import OperationsLog from './OperationsLog';
 import WarehousePanel from './WarehousePanel';
+import TyphoonTimeline from './TyphoonTimeline';
 import type { Warehouse, ActiveAlert, OpsLogEntry, Region, DeploymentState } from '../../types';
 
 // ── colour helpers ────────────────────────────────────────────────────────────
@@ -236,9 +238,50 @@ export default function DisasterRelief({ warehouses, alerts, regions, dataSource
 
       {/* ── Alert banner + map + right panel ──────────────────────────────── */}
       <div style={{ flex: 1, minHeight: 0, display: 'flex', overflow: 'hidden' }}>
-        {/* Left: banner + map */}
+        {/* Left: banner + map + timeline */}
         <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
           <AlertBanner alert={alert} dataSource={dataSource} loading={loading} />
+
+          {/* Earthquake tremor time strip */}
+          {alert.type === 'earthquake' && alert.occurredAt && (
+            <div style={{
+              flexShrink: 0,
+              background: 'var(--bg-surface)',
+              borderBottom: `1px solid ${disasterColor(alert)}30`,
+              padding: '6px 16px',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 10,
+            }}>
+              <Clock size={11} color={disasterColor(alert)} strokeWidth={1.5} />
+              <div style={{ display: 'flex', alignItems: 'center', gap: 16, flexWrap: 'wrap' }}>
+                <div>
+                  <span style={{ fontFamily: 'var(--font-mono)', fontSize: 8, color: 'var(--text-muted)', letterSpacing: '0.1em' }}>
+                    TREMOR RECORDED
+                  </span>
+                  <span style={{ fontFamily: 'var(--font-mono)', fontSize: 9, color: 'var(--text-primary)', marginLeft: 8 }}>
+                    {format(parseISO(alert.occurredAt), 'MMM d, yyyy · HH:mm')} PHT
+                  </span>
+                </div>
+                <div>
+                  <span style={{ fontFamily: 'var(--font-mono)', fontSize: 8, color: 'var(--text-muted)', letterSpacing: '0.1em' }}>
+                    EPICENTER
+                  </span>
+                  <span style={{ fontFamily: 'var(--font-mono)', fontSize: 9, color: 'var(--text-secondary)', marginLeft: 8 }}>
+                    {alert.coordinates.lat.toFixed(2)}°N {alert.coordinates.lng.toFixed(2)}°E
+                  </span>
+                </div>
+                <div>
+                  <span style={{ fontFamily: 'var(--font-mono)', fontSize: 8, color: 'var(--text-muted)', letterSpacing: '0.1em' }}>
+                    DEPTH
+                  </span>
+                  <span style={{ fontFamily: 'var(--font-mono)', fontSize: 9, color: 'var(--text-secondary)', marginLeft: 8 }}>
+                    {alert.depth} km
+                  </span>
+                </div>
+              </div>
+            </div>
+          )}
 
           <div style={{ flex: 1, overflow: 'hidden' }}>
             <PhilippinesMap
@@ -250,6 +293,11 @@ export default function DisasterRelief({ warehouses, alerts, regions, dataSource
               onWarehouseClick={setSelectedWarehouseId}
             />
           </div>
+
+          {/* Typhoon forecast track timeline */}
+          {(alert.type === 'typhoon' || alert.type === 'tropical_storm' || alert.type === 'tropical_depression') && alert.track.length > 0 && (
+            <TyphoonTimeline track={alert.track} lastUpdated={alert.lastUpdated} />
+          )}
         </div>
 
         {/* Right panel */}
