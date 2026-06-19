@@ -1,6 +1,6 @@
 import { Package, Droplets, Utensils, Heart, Home, Anchor, AlertTriangle } from 'lucide-react';
 import type { Warehouse } from '../../types';
-import { useIsMobile } from '../../hooks/useBreakpoint';
+import { useIsNarrow } from '../../hooks/useBreakpoint';
 
 const CAT_ICONS = {
   water: Droplets, food: Utensils, medical: Heart, shelter: Home, rescue: Anchor,
@@ -26,7 +26,7 @@ interface Props {
 }
 
 export default function Inventory({ warehouses }: Props) {
-  const isMobile = useIsMobile();
+  const isMobile = useIsNarrow();
 
   const lowStockItems = warehouses.flatMap(wh =>
     (Object.entries(wh.inventory) as [keyof typeof CAT_ICONS, { qty: number; unit: string; threshold: number }][])

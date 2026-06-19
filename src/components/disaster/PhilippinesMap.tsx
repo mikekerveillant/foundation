@@ -1,3 +1,4 @@
+import { useRef, useState, useEffect } from 'react';
 import { format, parseISO } from 'date-fns';
 import { ComposableMap, Geographies, Geography, Marker, ZoomableGroup, Line } from 'react-simple-maps';
 import type { Warehouse, ActiveAlert, Region } from '../../types';
@@ -98,8 +99,21 @@ export default function PhilippinesMap({ warehouses, alerts, selectedAlertIdx, r
     : selectedAlert.type === 'volcanic' ? 'volcanic'
     : null;
 
+  // Measure container so SVG renders at correct size on first paint
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [dims, setDims] = useState<{ w: number; h: number } | null>(null);
+  useEffect(() => {
+    if (!containerRef.current) return;
+    const ro = new ResizeObserver(entries => {
+      const { width, height } = entries[0].contentRect;
+      if (width > 0 && height > 0) setDims({ w: Math.round(width), h: Math.round(height) });
+    });
+    ro.observe(containerRef.current);
+    return () => ro.disconnect();
+  }, []);
+
   return (
-    <div style={{ width: '100%', height: '100%', background: '#0E1419', position: 'relative', overflow: 'hidden' }}>
+    <div ref={containerRef} style={{ width: '100%', height: '100%', background: '#0E1419', position: 'relative', overflow: 'hidden', touchAction: 'none' }}>
       {/* Grid */}
       <div style={{
         position: 'absolute', inset: 0, pointerEvents: 'none', zIndex: 0,
@@ -122,6 +136,8 @@ export default function PhilippinesMap({ warehouses, alerts, selectedAlertIdx, r
       <ComposableMap
         projection="geoMercator"
         projectionConfig={{ scale: 2200, center: [122, 12] }}
+        width={dims?.w ?? 800}
+        height={dims?.h ?? 600}
         style={{ width: '100%', height: '100%', position: 'relative', zIndex: 1 }}
       >
         <ZoomableGroup center={[122, 12]} zoom={1} minZoom={0.8} maxZoom={4}>

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { ComposedChart, Bar, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart } from 'recharts';
 import type { BudgetCategory } from '../../types';
-import { useIsMobile } from '../../hooks/useBreakpoint';
+import { useIsNarrow } from '../../hooks/useBreakpoint';
 
 function php(n: number) {
   return `₱${(n / 1_000_000).toFixed(2)}M`;
@@ -26,7 +26,7 @@ interface Props {
 
 export default function Budget({ categories }: Props) {
   const [selectedCat, setSelectedCat] = useState<string>('all');
-  const isMobile = useIsMobile();
+  const isMobile = useIsNarrow();
 
   const totalBudget = categories.reduce((a, c) => a + c.annualBudget, 0);
   const totalSpent = categories.reduce((a, c) => a + c.spent, 0);

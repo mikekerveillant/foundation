@@ -1,6 +1,6 @@
 import { User, MapPin, CheckCircle, Clock, Briefcase } from 'lucide-react';
 import type { StaffMember, Warehouse } from '../../types';
-import { useIsMobile } from '../../hooks/useBreakpoint';
+import { useIsNarrow } from '../../hooks/useBreakpoint';
 
 const ROLE_COLORS: Record<string, string> = {
   'Field Coordinator': 'var(--blue)',
@@ -17,7 +17,7 @@ interface Props {
 }
 
 export default function Staffing({ staff, warehouses }: Props) {
-  const isMobile = useIsMobile();
+  const isMobile = useIsNarrow();
   const available = staff.filter(s => s.available);
   const deployed = staff.filter(s => !s.available);
   const byRegion = staff.reduce<Record<string, StaffMember[]>>((acc, s) => {

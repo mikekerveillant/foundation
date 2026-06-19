@@ -32,3 +32,16 @@ export function useIsShortScreen() {
   }, []);
   return v;
 }
+
+// ≤900px: covers ALL phone sizes in portrait AND landscape
+// Used for content layout in Budget/Staffing/Inventory where the 640px
+// breakpoint may miss landscape phones (667–900px wide)
+export function useIsNarrow() {
+  const [v, setV] = useState(() => window.innerWidth <= 900);
+  useEffect(() => {
+    const fn = () => setV(window.innerWidth <= 900);
+    window.addEventListener('resize', fn);
+    return () => window.removeEventListener('resize', fn);
+  }, []);
+  return v;
+}
