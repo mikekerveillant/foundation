@@ -234,30 +234,20 @@ export default function DisasterRelief({ warehouses, alerts, regions, dataSource
     ? <TyphoonTimeline track={alert.track} lastUpdated={alert.lastUpdated} />
     : null;
 
-  // ── MOBILE: flat scrolling column — no flex competition ───────────────────
+  // ── MOBILE: map fills screen — warehouse panel hidden (use desktop for detail) ──
   if (isMobile) {
     return (
-      <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100%' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
         {tabBar}
         <AlertBanner alert={alert} dataSource={dataSource} loading={loading} />
         {eqStrip}
-        <div style={{ height: '60vw', minHeight: 220, maxHeight: 320, flexShrink: 0, overflow: 'hidden' }}>
+        <div style={{ flex: 1, overflow: 'hidden' }}>
           <PhilippinesMap
             warehouses={warehouses} alerts={alerts} selectedAlertIdx={selectedAlertIdx}
             regions={regions} selectedWarehouseId={selectedWarehouseId} onWarehouseClick={setSelectedWarehouseId}
           />
         </div>
         {typhoonTimeline}
-        <div style={{ borderTop: '1px solid var(--border)', background: 'var(--bg-surface)', height: 320, overflow: 'hidden', display: 'flex', flexDirection: 'column', flexShrink: 0 }}>
-          <WarehousePanel
-            warehouses={warehouses} alert={alert} selectedId={selectedWarehouseId}
-            onSelect={setSelectedWarehouseId} deployments={deployments}
-            onDeploy={handleDeploy} onAddLog={onAddLog}
-          />
-        </div>
-        <div style={{ borderTop: '1px solid var(--border)', background: 'var(--bg-surface)', height: 260, overflow: 'hidden', display: 'flex', flexDirection: 'column', flexShrink: 0 }}>
-          <OperationsLog entries={opsLog} />
-        </div>
       </div>
     );
   }
