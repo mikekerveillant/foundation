@@ -206,11 +206,16 @@ body {
     --riskboard-height: 48px;
     --bottom-nav-height: 56px;
   }
+
+  html, body { overflow-x: hidden; }
+
   .app-layout {
     grid-template-columns: 1fr;
     grid-template-rows: var(--riskboard-height) minmax(0, 1fr);
     padding-bottom: var(--bottom-nav-height);
   }
+
+  /* sidebar moves to fixed bottom nav */
   .sidebar {
     position: fixed;
     bottom: 0; left: 0; right: 0;
@@ -220,6 +225,14 @@ body {
     border-right: none;
     border-top: 1px solid var(--border);
   }
+
+  /* riskboard and main both span full width */
   .riskboard { grid-column: 1; }
-  .main-content { grid-column: 1; overflow-y: auto; }
+
+  /* main content scrolls vertically, never overflows horizontally */
+  .main-content {
+    grid-column: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
 }
