@@ -99,7 +99,8 @@ export default function RiskBoard({ regions, dataSource, loading }: Props) {
       <div style={{
         display: 'flex',
         gap: 6,
-        overflow: 'hidden',
+        overflowX: 'auto',
+        WebkitOverflowScrolling: 'touch',
         flex: 1,
       }}>
         {regions.map(region => {

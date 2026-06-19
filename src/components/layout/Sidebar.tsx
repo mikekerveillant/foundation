@@ -1,5 +1,6 @@
 import { AlertTriangle, BarChart3, Users, Package } from 'lucide-react';
 import type { Module } from '../../types';
+import { useIsMobile } from '../../hooks/useBreakpoint';
 
 const NAV = [
   { id: 'disaster' as Module, icon: AlertTriangle, label: 'Disaster Relief', sub: 'Command' },
@@ -14,6 +15,43 @@ interface Props {
 }
 
 export default function Sidebar({ active, onChange }: Props) {
+  const isMobile = useIsMobile();
+
+  if (isMobile) {
+    return (
+      <nav style={{ display: 'flex', flexDirection: 'row', height: '100%', background: 'var(--bg-surface)', alignItems: 'center', justifyContent: 'space-around', padding: '0 8px' }}>
+        {NAV.map(({ id, icon: Icon, label }) => {
+          const isActive = active === id;
+          return (
+            <button
+              key={id}
+              onClick={() => onChange(id)}
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: 3,
+                flex: 1,
+                height: '100%',
+                background: 'transparent',
+                border: 'none',
+                borderTop: isActive ? '2px solid var(--amber)' : '2px solid transparent',
+                cursor: 'pointer',
+                padding: '0 4px',
+              }}
+            >
+              <Icon size={20} color={isActive ? 'var(--amber)' : 'var(--text-secondary)'} strokeWidth={1.5} />
+              <span style={{ fontFamily: 'var(--font-body)', fontSize: 8, color: isActive ? 'var(--text-primary)' : 'var(--text-secondary)', textAlign: 'center', lineHeight: 1.2 }}>
+                {label}
+              </span>
+            </button>
+          );
+        })}
+      </nav>
+    );
+  }
+
   return (
     <nav
       style={{

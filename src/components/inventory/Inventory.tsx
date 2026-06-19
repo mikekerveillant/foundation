@@ -110,7 +110,7 @@ export default function Inventory({ warehouses }: Props) {
         <div style={{ fontFamily: 'var(--font-display)', fontSize: 14, fontWeight: 600, color: 'var(--text-primary)', letterSpacing: '0.04em', marginBottom: 16 }}>
           NETWORK TOTALS
         </div>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 16 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(80px, 1fr))', gap: 16 }}>
           {(Object.entries(CAT_LABELS) as [keyof typeof CAT_ICONS, string][]).map(([cat, label]) => {
             const Icon = CAT_ICONS[cat];
             const total = totals[cat] ?? 0;
@@ -133,7 +133,7 @@ export default function Inventory({ warehouses }: Props) {
       </div>
 
       {/* Per-warehouse detail */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(440px, 1fr))', gap: 16 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(440px, 100%), 1fr))', gap: 16 }}>
         {warehouses.map(wh => {
           const hasLow = (Object.values(wh.inventory) as { qty: number; threshold: number }[]).some(v => v.qty < v.threshold * 1.2);
 

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { ComposedChart, Bar, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart } from 'recharts';
 import type { BudgetCategory } from '../../types';
+import { useIsMobile } from '../../hooks/useBreakpoint';
 
 function php(n: number) {
   return `₱${(n / 1_000_000).toFixed(2)}M`;
@@ -25,6 +26,7 @@ interface Props {
 
 export default function Budget({ categories }: Props) {
   const [selectedCat, setSelectedCat] = useState<string>('all');
+  const isMobile = useIsMobile();
 
   const totalBudget = categories.reduce((a, c) => a + c.annualBudget, 0);
   const totalSpent = categories.reduce((a, c) => a + c.spent, 0);
@@ -82,7 +84,7 @@ export default function Budget({ categories }: Props) {
             PHILIPPINE PESO · JAN – DEC 2024 · AS OF OCT 2024
           </div>
         </div>
-        <div style={{ display: 'flex', gap: 20 }}>
+        <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
           {[
             { label: 'Annual Budget', value: php(totalBudget), color: 'var(--text-secondary)' },
             { label: 'Spent (YTD)', value: php(totalSpent), color: 'var(--amber)' },
@@ -127,7 +129,7 @@ export default function Budget({ categories }: Props) {
       </div>
 
       {/* Main charts row */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, marginBottom: 24 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: 20, marginBottom: 24 }}>
         {/* Burn-down chart */}
         <div style={{ background: 'var(--bg-surface)', border: '1px solid var(--border)', borderRadius: 8, padding: '20px 20px 12px' }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>

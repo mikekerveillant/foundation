@@ -199,3 +199,27 @@ body {
     --riskboard-height: 60px;
   }
 }
+
+@media (max-width: 640px) {
+  :root {
+    --sidebar-width: 0px;
+    --riskboard-height: 48px;
+    --bottom-nav-height: 56px;
+  }
+  .app-layout {
+    grid-template-columns: 1fr;
+    grid-template-rows: var(--riskboard-height) minmax(0, 1fr);
+    padding-bottom: var(--bottom-nav-height);
+  }
+  .sidebar {
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    height: var(--bottom-nav-height);
+    grid-row: unset; grid-column: unset;
+    z-index: 100;
+    border-right: none;
+    border-top: 1px solid var(--border);
+  }
+  .riskboard { grid-column: 1; }
+  .main-content { grid-column: 1; overflow-y: auto; }
+}

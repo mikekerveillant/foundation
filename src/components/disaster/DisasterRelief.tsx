@@ -6,6 +6,7 @@ import OperationsLog from './OperationsLog';
 import WarehousePanel from './WarehousePanel';
 import TyphoonTimeline from './TyphoonTimeline';
 import type { Warehouse, ActiveAlert, OpsLogEntry, Region, DeploymentState } from '../../types';
+import { useIsMobile } from '../../hooks/useBreakpoint';
 
 // ── colour helpers ────────────────────────────────────────────────────────────
 
@@ -145,6 +146,7 @@ export default function DisasterRelief({ warehouses, alerts, regions, dataSource
   const [selectedAlertIdx, setSelectedAlertIdx] = useState(0);
   const [selectedWarehouseId, setSelectedWarehouseId] = useState<string | null>(null);
   const [deployments, setDeployments] = useState<DeploymentState[]>([]);
+  const isMobile = useIsMobile();
 
   const alert = alerts[selectedAlertIdx] ?? alerts[0];
 
@@ -237,7 +239,10 @@ export default function DisasterRelief({ warehouses, alerts, regions, dataSource
       </div>
 
       {/* ── Alert banner + map + right panel ──────────────────────────────── */}
-      <div style={{ flex: 1, minHeight: 0, display: 'flex', overflow: 'hidden' }}>
+      <div style={isMobile
+        ? { display: 'flex', flexDirection: 'column', overflow: 'auto', flex: 1 }
+        : { flex: 1, minHeight: 0, display: 'flex', overflow: 'hidden' }
+      }>
         {/* Left: banner + map + timeline */}
         <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
           <AlertBanner alert={alert} dataSource={dataSource} loading={loading} />
@@ -283,7 +288,10 @@ export default function DisasterRelief({ warehouses, alerts, regions, dataSource
             </div>
           )}
 
-          <div style={{ flex: 1, overflow: 'hidden' }}>
+          <div style={isMobile
+            ? { height: 'min(55vw, 320px)', flexShrink: 0, overflow: 'hidden' }
+            : { flex: 1, overflow: 'hidden' }
+          }>
             <PhilippinesMap
               warehouses={warehouses}
               alerts={alerts}
@@ -301,8 +309,11 @@ export default function DisasterRelief({ warehouses, alerts, regions, dataSource
         </div>
 
         {/* Right panel */}
-        <div style={{ width: 320, flexShrink: 0, display: 'flex', flexDirection: 'column', borderLeft: '1px solid var(--border)', background: 'var(--bg-surface)', overflow: 'hidden', height: '100%' }}>
-          <div style={{ flex: 3, minHeight: 0, borderBottom: '1px solid var(--border)', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+        <div style={isMobile
+          ? { width: '100%', borderLeft: 'none', borderTop: '1px solid var(--border)', flexShrink: 0, maxHeight: 480, overflow: 'auto', display: 'flex', flexDirection: 'column', background: 'var(--bg-surface)' }
+          : { width: 320, flexShrink: 0, display: 'flex', flexDirection: 'column', borderLeft: '1px solid var(--border)', background: 'var(--bg-surface)', overflow: 'hidden', height: '100%' }
+        }>
+          <div style={{ flex: 1, minHeight: 0, borderBottom: '1px solid var(--border)', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
             <WarehousePanel
               warehouses={warehouses}
               alert={alert}
@@ -313,7 +324,7 @@ export default function DisasterRelief({ warehouses, alerts, regions, dataSource
               onAddLog={onAddLog}
             />
           </div>
-          <div style={{ flex: 2, minHeight: 0, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+          <div style={{ flex: 1, minHeight: 0, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
             <OperationsLog entries={opsLog} />
           </div>
         </div>
