@@ -296,25 +296,36 @@ export const INITIAL_OPS_LOG: OpsLogEntry[] = [
   },
 ];
 
-// Deterministic pseudo-random using a simple seed to keep budget data stable across renders
-function seededRand(seed: number): number {
-  const x = Math.sin(seed) * 10000;
-  return x - Math.floor(x);
-}
-
-const makeMonthly = (annualBudget: number, spentFraction: number, variance: number, seed = 1): import('../types').BudgetMonthly[] => {
+// Monthly spend multipliers (relative to equal monthly budget share).
+// Shape reflects Philippine disaster calendar: quiet Jan–May, ramp Jun–Aug,
+// surge Sep–Oct (typhoon season peak + Typhoon Kristine + earthquake response).
+const makeMonthly = (annualBudget: number, multipliers: number[]): import('../types').BudgetMonthly[] => {
   const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
   const monthlyBudget = annualBudget / 12;
   let cumBudget = 0;
   let cumSpent = 0;
   return months.map((month, i) => {
     const b = monthlyBudget;
-    const s = i < 10 ? monthlyBudget * (spentFraction + (seededRand(seed + i) - 0.5) * variance) : 0;
+    const s = i < 10 ? Math.round(monthlyBudget * multipliers[i]) : 0;
     cumBudget += b;
     cumSpent += s;
-    return { month, budget: Math.round(b), spent: Math.round(s), cumBudget: Math.round(cumBudget), cumSpent: Math.round(cumSpent) };
+    return { month, budget: Math.round(b), spent: s, cumBudget: Math.round(cumBudget), cumSpent: Math.round(cumSpent) };
   });
 };
+
+// Disaster Relief: spikes in Aug (Habagat floods), big surge Oct (Typhoon Kristine + M6.7 quake)
+const disasterMultipliers = [0.45, 0.38, 0.42, 0.55, 0.68, 0.80, 0.95, 1.40, 1.15, 3.38, 0, 0];
+// Community Programs: modest ramp, elevated Oct for post-disaster support
+const programsMultipliers = [0.70, 0.65, 0.72, 0.75, 0.78, 0.82, 0.85, 1.05, 0.92, 1.34, 0, 0];
+// Staffing & HR: mostly stable salaries, overtime spikes in Aug/Oct
+const staffingMultipliers = [0.82, 0.80, 0.82, 0.84, 0.85, 0.88, 0.90, 0.95, 0.92, 1.06, 0, 0];
+// Operations & Logistics: follows disaster curve closely (fuel, transport, warehousing)
+const operationsMultipliers = [0.55, 0.50, 0.58, 0.65, 0.72, 0.85, 0.95, 1.35, 1.15, 2.49, 0, 0];
+
+const disasterMonthly = makeMonthly(17_500_000, disasterMultipliers);
+const programsMonthly = makeMonthly(12_500_000, programsMultipliers);
+const staffingMonthly = makeMonthly(12_500_000, staffingMultipliers);
+const operationsMonthly = makeMonthly(7_500_000, operationsMultipliers);
 
 export const BUDGET_CATEGORIES: BudgetCategory[] = [
   {
@@ -322,32 +333,32 @@ export const BUDGET_CATEGORIES: BudgetCategory[] = [
     name: 'Disaster Relief',
     color: '#E8901C',
     annualBudget: 17_500_000,
-    spent: 14_820_000,
-    monthly: makeMonthly(17_500_000, 1.05, 0.4, 7),
+    spent: disasterMonthly.reduce((a, m) => a + m.spent, 0),
+    monthly: disasterMonthly,
   },
   {
     id: 'programs',
     name: 'Community Programs',
     color: '#3E8FB0',
     annualBudget: 12_500_000,
-    spent: 8_940_000,
-    monthly: makeMonthly(12_500_000, 0.72, 0.3, 13),
+    spent: programsMonthly.reduce((a, m) => a + m.spent, 0),
+    monthly: programsMonthly,
   },
   {
     id: 'staffing',
     name: 'Staffing & HR',
     color: '#6B8F71',
     annualBudget: 12_500_000,
-    spent: 9_210_000,
-    monthly: makeMonthly(12_500_000, 0.82, 0.15, 19),
+    spent: staffingMonthly.reduce((a, m) => a + m.spent, 0),
+    monthly: staffingMonthly,
   },
   {
     id: 'operations',
     name: 'Operations & Logistics',
     color: '#8A9BB0',
     annualBudget: 7_500_000,
-    spent: 6_120_000,
-    monthly: makeMonthly(7_500_000, 0.91, 0.25, 31),
+    spent: operationsMonthly.reduce((a, m) => a + m.spent, 0),
+    monthly: operationsMonthly,
   },
 ];
 
