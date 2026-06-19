@@ -57,75 +57,80 @@ function disasterTypeLabel(type: ActiveAlert['type']): string {
 
 // ── alert banner ──────────────────────────────────────────────────────────────
 
-function AlertBanner({ alert, loading }: { alert: ActiveAlert; dataSource: 'live' | 'mock'; loading: boolean }) {
+function AlertBanner({ alert, loading, compact = false }: { alert: ActiveAlert; dataSource: 'live' | 'mock'; loading: boolean; compact?: boolean }) {
   const color = disasterColor(alert);
+  const numSz = compact ? 20 : 26;
+  const pad = compact ? '4px 9px' : '5px 12px';
 
   const badge = alert.type === 'typhoon' || alert.type === 'tropical_storm' || alert.type === 'tropical_depression' ? (
-    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '5px 12px', background: `${color}18`, border: `1px solid ${color}40`, borderRadius: 6, flexShrink: 0 }}>
-      <div style={{ fontFamily: 'var(--font-mono)', fontSize: 9, color, letterSpacing: '0.1em' }}>TCWS</div>
-      <div style={{ fontFamily: 'var(--font-mono)', fontSize: 26, fontWeight: 700, color, lineHeight: 1 }}>{alert.signalNumber}</div>
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: pad, background: `${color}18`, border: `1px solid ${color}40`, borderRadius: 6, flexShrink: 0 }}>
+      <div style={{ fontFamily: 'var(--font-mono)', fontSize: 8, color, letterSpacing: '0.1em' }}>TCWS</div>
+      <div style={{ fontFamily: 'var(--font-mono)', fontSize: numSz, fontWeight: 700, color, lineHeight: 1 }}>{alert.signalNumber}</div>
     </div>
   ) : alert.type === 'earthquake' ? (
-    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '5px 12px', background: `${color}18`, border: `1px solid ${color}40`, borderRadius: 6, flexShrink: 0 }}>
-      <div style={{ fontFamily: 'var(--font-mono)', fontSize: 9, color, letterSpacing: '0.1em' }}>MAG</div>
-      <div style={{ fontFamily: 'var(--font-mono)', fontSize: 26, fontWeight: 700, color, lineHeight: 1 }}>{alert.magnitude?.toFixed(1)}</div>
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: pad, background: `${color}18`, border: `1px solid ${color}40`, borderRadius: 6, flexShrink: 0 }}>
+      <div style={{ fontFamily: 'var(--font-mono)', fontSize: 8, color, letterSpacing: '0.1em' }}>MAG</div>
+      <div style={{ fontFamily: 'var(--font-mono)', fontSize: numSz, fontWeight: 700, color, lineHeight: 1 }}>{alert.magnitude?.toFixed(1)}</div>
     </div>
   ) : alert.type === 'volcanic' ? (
-    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '5px 12px', background: `${color}18`, border: `1px solid ${color}40`, borderRadius: 6, flexShrink: 0 }}>
-      <div style={{ fontFamily: 'var(--font-mono)', fontSize: 9, color, letterSpacing: '0.1em' }}>LEVEL</div>
-      <div style={{ fontFamily: 'var(--font-mono)', fontSize: 26, fontWeight: 700, color, lineHeight: 1 }}>{alert.volcanoAlertLevel}</div>
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: pad, background: `${color}18`, border: `1px solid ${color}40`, borderRadius: 6, flexShrink: 0 }}>
+      <div style={{ fontFamily: 'var(--font-mono)', fontSize: 8, color, letterSpacing: '0.1em' }}>LEVEL</div>
+      <div style={{ fontFamily: 'var(--font-mono)', fontSize: numSz, fontWeight: 700, color, lineHeight: 1 }}>{alert.volcanoAlertLevel}</div>
     </div>
   ) : null;
 
   const subtitle = alert.type === 'typhoon' || alert.type === 'tropical_storm' || alert.type === 'tropical_depression'
-    ? `TCWS ${SIGNAL_DESC[alert.signalNumber]} · ${alert.intensity}`
+    ? compact ? alert.intensity : `TCWS ${SIGNAL_DESC[alert.signalNumber]} · ${alert.intensity}`
     : alert.type === 'earthquake'
-    ? `PHIVOLCS Intensity ${alert.phivolcsIntensity} · Depth ${alert.depth} km · ${alert.intensity}`
+    ? compact ? `Intensity ${alert.phivolcsIntensity} · ${alert.depth} km depth` : `PHIVOLCS Intensity ${alert.phivolcsIntensity} · Depth ${alert.depth} km · ${alert.intensity}`
     : alert.type === 'volcanic'
-    ? `${VOLCANO_LEVEL_DESC[alert.volcanoAlertLevel ?? 0]} · ${alert.dangerZoneKm} km PDZ · PHIVOLCS`
+    ? compact ? `${alert.dangerZoneKm} km PDZ · ${VOLCANO_LEVEL_DESC[alert.volcanoAlertLevel ?? 0].split(' —')[0]}` : `${VOLCANO_LEVEL_DESC[alert.volcanoAlertLevel ?? 0]} · ${alert.dangerZoneKm} km PDZ · PHIVOLCS`
     : alert.intensity;
 
   return (
     <div style={{
       background: `linear-gradient(90deg, ${color}15, transparent)`,
       borderBottom: `1px solid ${color}30`,
-      padding: '8px 16px',
+      padding: compact ? '6px 12px' : '8px 16px',
       display: 'flex',
       alignItems: 'center',
-      gap: 12,
+      gap: compact ? 8 : 12,
       flexShrink: 0,
     }}>
-      {disasterIcon(alert)}
+      {disasterIcon(alert, compact ? 14 : 18)}
       <div style={{ flex: 1, minWidth: 0 }}>
-        <div style={{ fontFamily: 'var(--font-display)', fontSize: 14, fontWeight: 700, color: 'var(--text-primary)', letterSpacing: '0.02em', lineHeight: 1.2 }}>
+        <div style={{ fontFamily: 'var(--font-display)', fontSize: compact ? 12 : 14, fontWeight: 700, color: 'var(--text-primary)', letterSpacing: '0.02em', lineHeight: 1.2, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
           {alert.name.toUpperCase()}
         </div>
-        <div style={{ fontFamily: 'var(--font-mono)', fontSize: 9, color: 'var(--text-secondary)', marginTop: 2, lineHeight: 1.4 }}>
+        <div style={{ fontFamily: 'var(--font-mono)', fontSize: 8, color: 'var(--text-secondary)', marginTop: 2, lineHeight: 1.4, whiteSpace: compact ? 'nowrap' : 'normal', overflow: 'hidden', textOverflow: compact ? 'ellipsis' : 'unset' }}>
           {subtitle}
         </div>
       </div>
 
       {badge}
 
-      <div style={{ display: 'flex', alignItems: 'center', gap: 5, fontFamily: 'var(--font-mono)', fontSize: 9, color: 'var(--text-muted)', flexShrink: 0 }}>
-        {!loading && (alert.source === 'live'
-          ? <><Wifi size={10} color="var(--sage)" /> GDACS</>
-          : <><WifiOff size={10} color="var(--text-muted)" /> SAMPLE</>
-        )}
-      </div>
-
-      <div style={{ flexShrink: 0, display: 'flex', gap: 3, flexWrap: 'wrap', maxWidth: 180 }}>
-        {alert.affectedProvinces.slice(0, 4).map(p => (
-          <span key={p} style={{ fontFamily: 'var(--font-mono)', fontSize: 8, color, background: `${color}10`, border: `1px solid ${color}28`, padding: '1px 5px', borderRadius: 3, letterSpacing: '0.04em' }}>
-            {p.toUpperCase()}
-          </span>
-        ))}
-        {alert.affectedProvinces.length > 4 && (
-          <span style={{ fontFamily: 'var(--font-mono)', fontSize: 8, color: 'var(--text-muted)' }}>
-            +{alert.affectedProvinces.length - 4}
-          </span>
-        )}
-      </div>
+      {!compact && (
+        <>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 5, fontFamily: 'var(--font-mono)', fontSize: 9, color: 'var(--text-muted)', flexShrink: 0 }}>
+            {!loading && (alert.source === 'live'
+              ? <><Wifi size={10} color="var(--sage)" /> GDACS</>
+              : <><WifiOff size={10} color="var(--text-muted)" /> SAMPLE</>
+            )}
+          </div>
+          <div style={{ flexShrink: 0, display: 'flex', gap: 3, flexWrap: 'wrap', maxWidth: 180 }}>
+            {alert.affectedProvinces.slice(0, 4).map(p => (
+              <span key={p} style={{ fontFamily: 'var(--font-mono)', fontSize: 8, color, background: `${color}10`, border: `1px solid ${color}28`, padding: '1px 5px', borderRadius: 3, letterSpacing: '0.04em' }}>
+                {p.toUpperCase()}
+              </span>
+            ))}
+            {alert.affectedProvinces.length > 4 && (
+              <span style={{ fontFamily: 'var(--font-mono)', fontSize: 8, color: 'var(--text-muted)' }}>
+                +{alert.affectedProvinces.length - 4}
+              </span>
+            )}
+          </div>
+        </>
+      )}
     </div>
   );
 }
@@ -189,14 +194,18 @@ export default function DisasterRelief({ warehouses, alerts, regions, dataSource
         const color = disasterColor(a);
         return (
           <button key={a.id} onClick={() => setSelectedAlertIdx(idx)} style={{
-            display: 'flex', alignItems: 'center', gap: 7, padding: '9px 14px', border: 'none',
+            display: 'flex', alignItems: 'center', gap: useCompactLayout ? 5 : 7,
+            padding: useCompactLayout ? '8px 10px' : '9px 14px', border: 'none',
             borderBottom: isActive ? `2px solid ${color}` : '2px solid transparent',
             background: 'transparent', cursor: 'pointer', whiteSpace: 'nowrap', marginBottom: -1,
           }}>
-            {disasterIcon(a, 13)}
-            <span style={{ fontFamily: 'var(--font-display)', fontSize: 13, fontWeight: 600, color: isActive ? 'var(--text-primary)' : 'var(--text-muted)', letterSpacing: '0.02em' }}>
-              {disasterTypeLabel(a.type)}
-            </span>
+            {disasterIcon(a, useCompactLayout ? 14 : 13)}
+            {/* Hide text label on compact to save space — pill alone identifies the alert */}
+            {!useCompactLayout && (
+              <span style={{ fontFamily: 'var(--font-display)', fontSize: 13, fontWeight: 600, color: isActive ? 'var(--text-primary)' : 'var(--text-muted)', letterSpacing: '0.02em' }}>
+                {disasterTypeLabel(a.type)}
+              </span>
+            )}
             {(a.type === 'typhoon' || a.type === 'tropical_storm' || a.type === 'tropical_depression') && (
               <span style={{ fontFamily: 'var(--font-mono)', fontSize: 9, color, background: `${color}15`, border: `1px solid ${color}35`, padding: '1px 6px', borderRadius: 3 }}>S{a.signalNumber}</span>
             )}
@@ -242,7 +251,7 @@ export default function DisasterRelief({ warehouses, alerts, regions, dataSource
     return (
       <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
         {tabBar}
-        <AlertBanner alert={alert} dataSource={dataSource} loading={loading} />
+        <AlertBanner alert={alert} dataSource={dataSource} loading={loading} compact />
         {eqStrip}
         <div style={{ flex: 1, overflow: 'hidden' }}>
           <PhilippinesMap
