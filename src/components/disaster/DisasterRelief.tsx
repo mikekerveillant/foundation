@@ -5,6 +5,7 @@ import PhilippinesMap from './PhilippinesMap';
 import OperationsLog from './OperationsLog';
 import WarehousePanel from './WarehousePanel';
 import TyphoonTimeline from './TyphoonTimeline';
+import { useIsMobile } from '../../hooks/useBreakpoint';
 import type { Warehouse, ActiveAlert, OpsLogEntry, Region, DeploymentState } from '../../types';
 
 // ── colour helpers ────────────────────────────────────────────────────────────
@@ -145,6 +146,7 @@ export default function DisasterRelief({ warehouses, alerts, regions, dataSource
   const [selectedAlertIdx, setSelectedAlertIdx] = useState(0);
   const [selectedWarehouseId, setSelectedWarehouseId] = useState<string | null>(null);
   const [deployments, setDeployments] = useState<DeploymentState[]>([]);
+  const isMobile = useIsMobile();
 
   const alert = alerts[selectedAlertIdx] ?? alerts[0];
 
@@ -172,145 +174,116 @@ export default function DisasterRelief({ warehouses, alerts, regions, dataSource
     });
   }
 
+  // ── shared pieces ─────────────────────────────────────────────────────────
+  const tabBar = (
+    <div style={{
+      display: 'flex', alignItems: 'center', gap: 0, background: 'var(--bg-surface)',
+      borderBottom: '1px solid var(--border)', padding: '0 12px', flexShrink: 0,
+      overflowX: 'auto',
+      ...(isMobile ? { position: 'sticky', top: 0, zIndex: 10 } : {}),
+    }}>
+      {alerts.map((a, idx) => {
+        const isActive = idx === selectedAlertIdx;
+        const color = disasterColor(a);
+        return (
+          <button key={a.id} onClick={() => setSelectedAlertIdx(idx)} style={{
+            display: 'flex', alignItems: 'center', gap: 7, padding: '9px 14px', border: 'none',
+            borderBottom: isActive ? `2px solid ${color}` : '2px solid transparent',
+            background: 'transparent', cursor: 'pointer', whiteSpace: 'nowrap', marginBottom: -1,
+          }}>
+            {disasterIcon(a, 13)}
+            <span style={{ fontFamily: 'var(--font-display)', fontSize: 13, fontWeight: 600, color: isActive ? 'var(--text-primary)' : 'var(--text-muted)', letterSpacing: '0.02em' }}>
+              {disasterTypeLabel(a.type)}
+            </span>
+            {(a.type === 'typhoon' || a.type === 'tropical_storm' || a.type === 'tropical_depression') && (
+              <span style={{ fontFamily: 'var(--font-mono)', fontSize: 9, color, background: `${color}15`, border: `1px solid ${color}35`, padding: '1px 6px', borderRadius: 3 }}>S{a.signalNumber}</span>
+            )}
+            {a.type === 'earthquake' && (
+              <span style={{ fontFamily: 'var(--font-mono)', fontSize: 9, color, background: `${color}15`, border: `1px solid ${color}35`, padding: '1px 6px', borderRadius: 3 }}>M{a.magnitude?.toFixed(1)}</span>
+            )}
+            {a.type === 'volcanic' && (
+              <span style={{ fontFamily: 'var(--font-mono)', fontSize: 9, color, background: `${color}15`, border: `1px solid ${color}35`, padding: '1px 6px', borderRadius: 3 }}>L{a.volcanoAlertLevel}</span>
+            )}
+          </button>
+        );
+      })}
+    </div>
+  );
+
+  const eqStrip = alert.type === 'earthquake' && alert.occurredAt ? (
+    <div style={{ flexShrink: 0, background: 'var(--bg-surface)', borderBottom: `1px solid ${disasterColor(alert)}30`, padding: '6px 16px', display: 'flex', alignItems: 'center', gap: 10 }}>
+      <Clock size={11} color={disasterColor(alert)} strokeWidth={1.5} />
+      <div style={{ display: 'flex', alignItems: 'center', gap: 16, flexWrap: 'wrap' }}>
+        <div>
+          <span style={{ fontFamily: 'var(--font-mono)', fontSize: 8, color: 'var(--text-muted)', letterSpacing: '0.1em' }}>TREMOR RECORDED</span>
+          <span style={{ fontFamily: 'var(--font-mono)', fontSize: 9, color: 'var(--text-primary)', marginLeft: 8 }}>{format(parseISO(alert.occurredAt), 'MMM d, yyyy · HH:mm')} PHT</span>
+        </div>
+        <div>
+          <span style={{ fontFamily: 'var(--font-mono)', fontSize: 8, color: 'var(--text-muted)', letterSpacing: '0.1em' }}>EPICENTER</span>
+          <span style={{ fontFamily: 'var(--font-mono)', fontSize: 9, color: 'var(--text-secondary)', marginLeft: 8 }}>{alert.coordinates.lat.toFixed(2)}°N {alert.coordinates.lng.toFixed(2)}°E</span>
+        </div>
+        <div>
+          <span style={{ fontFamily: 'var(--font-mono)', fontSize: 8, color: 'var(--text-muted)', letterSpacing: '0.1em' }}>DEPTH</span>
+          <span style={{ fontFamily: 'var(--font-mono)', fontSize: 9, color: 'var(--text-secondary)', marginLeft: 8 }}>{alert.depth} km</span>
+        </div>
+      </div>
+    </div>
+  ) : null;
+
+  const typhoonTimeline = (alert.type === 'typhoon' || alert.type === 'tropical_storm' || alert.type === 'tropical_depression') && alert.track.length > 0
+    ? <TyphoonTimeline track={alert.track} lastUpdated={alert.lastUpdated} />
+    : null;
+
+  // ── MOBILE: flat scrolling column — no flex competition ───────────────────
+  if (isMobile) {
+    return (
+      <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100%' }}>
+        {tabBar}
+        <AlertBanner alert={alert} dataSource={dataSource} loading={loading} />
+        {eqStrip}
+        <div style={{ height: '60vw', minHeight: 220, maxHeight: 320, flexShrink: 0, overflow: 'hidden' }}>
+          <PhilippinesMap
+            warehouses={warehouses} alerts={alerts} selectedAlertIdx={selectedAlertIdx}
+            regions={regions} selectedWarehouseId={selectedWarehouseId} onWarehouseClick={setSelectedWarehouseId}
+          />
+        </div>
+        {typhoonTimeline}
+        <div style={{ borderTop: '1px solid var(--border)', background: 'var(--bg-surface)', height: 320, overflow: 'hidden', display: 'flex', flexDirection: 'column', flexShrink: 0 }}>
+          <WarehousePanel
+            warehouses={warehouses} alert={alert} selectedId={selectedWarehouseId}
+            onSelect={setSelectedWarehouseId} deployments={deployments}
+            onDeploy={handleDeploy} onAddLog={onAddLog}
+          />
+        </div>
+        <div style={{ borderTop: '1px solid var(--border)', background: 'var(--bg-surface)', height: 260, overflow: 'hidden', display: 'flex', flexDirection: 'column', flexShrink: 0 }}>
+          <OperationsLog entries={opsLog} />
+        </div>
+      </div>
+    );
+  }
+
+  // ── DESKTOP: original side-by-side layout ─────────────────────────────────
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden' }}>
-      {/* ── Disaster type selector tabs ────────────────────────────────────── */}
-      <div style={{
-        display: 'flex',
-        alignItems: 'center',
-        gap: 0,
-        background: 'var(--bg-surface)',
-        borderBottom: '1px solid var(--border)',
-        padding: '0 12px',
-        flexShrink: 0,
-        overflowX: 'auto',
-      }}>
-        {alerts.map((a, idx) => {
-          const isActive = idx === selectedAlertIdx;
-          const color = disasterColor(a);
-          return (
-            <button
-              key={a.id}
-              onClick={() => setSelectedAlertIdx(idx)}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: 7,
-                padding: '9px 14px',
-                border: 'none',
-                borderBottom: isActive ? `2px solid ${color}` : '2px solid transparent',
-                background: 'transparent',
-                cursor: 'pointer',
-                whiteSpace: 'nowrap',
-                marginBottom: -1,
-              }}
-            >
-              {disasterIcon(a, 13)}
-              <span style={{
-                fontFamily: 'var(--font-display)',
-                fontSize: 13,
-                fontWeight: 600,
-                color: isActive ? 'var(--text-primary)' : 'var(--text-muted)',
-                letterSpacing: '0.02em',
-              }}>
-                {disasterTypeLabel(a.type)}
-              </span>
-              {/* severity pill */}
-              {(a.type === 'typhoon' || a.type === 'tropical_storm' || a.type === 'tropical_depression') && (
-                <span style={{ fontFamily: 'var(--font-mono)', fontSize: 9, color, background: `${color}15`, border: `1px solid ${color}35`, padding: '1px 6px', borderRadius: 3 }}>
-                  S{a.signalNumber}
-                </span>
-              )}
-              {a.type === 'earthquake' && (
-                <span style={{ fontFamily: 'var(--font-mono)', fontSize: 9, color, background: `${color}15`, border: `1px solid ${color}35`, padding: '1px 6px', borderRadius: 3 }}>
-                  M{a.magnitude?.toFixed(1)}
-                </span>
-              )}
-              {a.type === 'volcanic' && (
-                <span style={{ fontFamily: 'var(--font-mono)', fontSize: 9, color, background: `${color}15`, border: `1px solid ${color}35`, padding: '1px 6px', borderRadius: 3 }}>
-                  L{a.volcanoAlertLevel}
-                </span>
-              )}
-            </button>
-          );
-        })}
-      </div>
-
-      {/* ── Alert banner + map + right panel ──────────────────────────────── */}
+      {tabBar}
       <div style={{ flex: 1, minHeight: 0, display: 'flex', overflow: 'hidden' }}>
-        {/* Left: banner + map + timeline */}
         <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
           <AlertBanner alert={alert} dataSource={dataSource} loading={loading} />
-
-          {/* Earthquake tremor time strip */}
-          {alert.type === 'earthquake' && alert.occurredAt && (
-            <div style={{
-              flexShrink: 0,
-              background: 'var(--bg-surface)',
-              borderBottom: `1px solid ${disasterColor(alert)}30`,
-              padding: '6px 16px',
-              display: 'flex',
-              alignItems: 'center',
-              gap: 10,
-            }}>
-              <Clock size={11} color={disasterColor(alert)} strokeWidth={1.5} />
-              <div style={{ display: 'flex', alignItems: 'center', gap: 16, flexWrap: 'wrap' }}>
-                <div>
-                  <span style={{ fontFamily: 'var(--font-mono)', fontSize: 8, color: 'var(--text-muted)', letterSpacing: '0.1em' }}>
-                    TREMOR RECORDED
-                  </span>
-                  <span style={{ fontFamily: 'var(--font-mono)', fontSize: 9, color: 'var(--text-primary)', marginLeft: 8 }}>
-                    {format(parseISO(alert.occurredAt), 'MMM d, yyyy · HH:mm')} PHT
-                  </span>
-                </div>
-                <div>
-                  <span style={{ fontFamily: 'var(--font-mono)', fontSize: 8, color: 'var(--text-muted)', letterSpacing: '0.1em' }}>
-                    EPICENTER
-                  </span>
-                  <span style={{ fontFamily: 'var(--font-mono)', fontSize: 9, color: 'var(--text-secondary)', marginLeft: 8 }}>
-                    {alert.coordinates.lat.toFixed(2)}°N {alert.coordinates.lng.toFixed(2)}°E
-                  </span>
-                </div>
-                <div>
-                  <span style={{ fontFamily: 'var(--font-mono)', fontSize: 8, color: 'var(--text-muted)', letterSpacing: '0.1em' }}>
-                    DEPTH
-                  </span>
-                  <span style={{ fontFamily: 'var(--font-mono)', fontSize: 9, color: 'var(--text-secondary)', marginLeft: 8 }}>
-                    {alert.depth} km
-                  </span>
-                </div>
-              </div>
-            </div>
-          )}
-
+          {eqStrip}
           <div style={{ flex: 1, overflow: 'hidden' }}>
             <PhilippinesMap
-              warehouses={warehouses}
-              alerts={alerts}
-              selectedAlertIdx={selectedAlertIdx}
-              regions={regions}
-              selectedWarehouseId={selectedWarehouseId}
-              onWarehouseClick={setSelectedWarehouseId}
+              warehouses={warehouses} alerts={alerts} selectedAlertIdx={selectedAlertIdx}
+              regions={regions} selectedWarehouseId={selectedWarehouseId} onWarehouseClick={setSelectedWarehouseId}
             />
           </div>
-
-          {/* Typhoon forecast track timeline */}
-          {(alert.type === 'typhoon' || alert.type === 'tropical_storm' || alert.type === 'tropical_depression') && alert.track.length > 0 && (
-            <TyphoonTimeline track={alert.track} lastUpdated={alert.lastUpdated} />
-          )}
+          {typhoonTimeline}
         </div>
-
-        {/* Right panel */}
         <div style={{ width: 320, flexShrink: 0, display: 'flex', flexDirection: 'column', borderLeft: '1px solid var(--border)', background: 'var(--bg-surface)', overflow: 'hidden', height: '100%' }}>
           <div style={{ flex: 3, minHeight: 0, borderBottom: '1px solid var(--border)', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
             <WarehousePanel
-              warehouses={warehouses}
-              alert={alert}
-              selectedId={selectedWarehouseId}
-              onSelect={setSelectedWarehouseId}
-              deployments={deployments}
-              onDeploy={handleDeploy}
-              onAddLog={onAddLog}
+              warehouses={warehouses} alert={alert} selectedId={selectedWarehouseId}
+              onSelect={setSelectedWarehouseId} deployments={deployments}
+              onDeploy={handleDeploy} onAddLog={onAddLog}
             />
           </div>
           <div style={{ flex: 2, minHeight: 0, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
