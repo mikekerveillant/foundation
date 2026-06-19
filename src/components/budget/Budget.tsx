@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts';
+import { ComposedChart, Bar, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart } from 'recharts';
 import type { BudgetCategory } from '../../types';
 
 function php(n: number) {
@@ -32,12 +32,14 @@ export default function Budget({ categories }: Props) {
 
   const activeCats = selectedCat === 'all' ? categories : categories.filter(c => c.id === selectedCat);
 
-  // Build cumulative burn chart data (12 months)
+  // Burn-down chart: annual budget depletes as monthly spend accumulates
+  const activeTotalBudget = activeCats.reduce((a, c) => a + c.annualBudget, 0);
   const burnData = Array.from({ length: 12 }, (_, i) => {
     const month = activeCats[0]?.monthly[i]?.month ?? `M${i + 1}`;
-    const cumBudget = activeCats.reduce((a, c) => a + (c.monthly[i]?.cumBudget ?? 0), 0);
+    if (i >= MONTHS_PASSED) return { month };
+    const monthlySpend = activeCats.reduce((a, c) => a + (c.monthly[i]?.spent ?? 0), 0);
     const cumSpent = activeCats.reduce((a, c) => a + (c.monthly[i]?.cumSpent ?? 0), 0);
-    return { month, cumBudget, cumSpent };
+    return { month, monthlySpend, remaining: activeTotalBudget - cumSpent };
   });
 
   // Monthly bar data
@@ -126,30 +128,32 @@ export default function Budget({ categories }: Props) {
 
       {/* Main charts row */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, marginBottom: 24 }}>
-        {/* Burn-up chart */}
+        {/* Burn-down chart */}
         <div style={{ background: 'var(--bg-surface)', border: '1px solid var(--border)', borderRadius: 8, padding: '20px 20px 12px' }}>
-          <div style={{ fontFamily: 'var(--font-display)', fontSize: 14, fontWeight: 600, color: 'var(--text-primary)', letterSpacing: '0.04em', marginBottom: 16 }}>
-            CUMULATIVE BURN
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
+            <div style={{ fontFamily: 'var(--font-display)', fontSize: 14, fontWeight: 600, color: 'var(--text-primary)', letterSpacing: '0.04em' }}>
+              BURN-DOWN
+            </div>
+            <div style={{ display: 'flex', gap: 16 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+                <div style={{ width: 12, height: 3, background: 'var(--amber)', borderRadius: 1 }} />
+                <span style={{ fontFamily: 'var(--font-mono)', fontSize: 9, color: 'var(--text-muted)', letterSpacing: '0.06em' }}>MONTHLY SPEND</span>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+                <svg width={16} height={4}><line x1={0} y1={2} x2={16} y2={2} stroke="var(--blue)" strokeWidth={2} strokeDasharray="4 2" /></svg>
+                <span style={{ fontFamily: 'var(--font-mono)', fontSize: 9, color: 'var(--text-muted)', letterSpacing: '0.06em' }}>REMAINING</span>
+              </div>
+            </div>
           </div>
           <ResponsiveContainer width="100%" height={200}>
-            <AreaChart data={burnData}>
-              <defs>
-                <linearGradient id="budgetGrad" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="var(--blue)" stopOpacity={0.15} />
-                  <stop offset="95%" stopColor="var(--blue)" stopOpacity={0.02} />
-                </linearGradient>
-                <linearGradient id="spentGrad" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="var(--amber)" stopOpacity={0.2} />
-                  <stop offset="95%" stopColor="var(--amber)" stopOpacity={0.02} />
-                </linearGradient>
-              </defs>
+            <ComposedChart data={burnData} margin={{ top: 4, right: 4, bottom: 0, left: 0 }}>
               <CartesianGrid stroke="var(--border)" strokeDasharray="3 0" vertical={false} />
               <XAxis dataKey="month" tick={{ fontFamily: 'var(--font-mono)', fontSize: 10, fill: 'var(--text-muted)' }} axisLine={false} tickLine={false} />
-              <YAxis tickFormatter={(v) => `₱${(v / 1e6).toFixed(0)}M`} tick={{ fontFamily: 'var(--font-mono)', fontSize: 10, fill: 'var(--text-muted)' }} axisLine={false} tickLine={false} width={55} />
+              <YAxis tickFormatter={(v) => `₱${(v / 1e6).toFixed(0)}M`} tick={{ fontFamily: 'var(--font-mono)', fontSize: 10, fill: 'var(--text-muted)' }} axisLine={false} tickLine={false} width={55} domain={[0, activeTotalBudget * 1.05]} />
               <Tooltip content={<CustomTooltip />} />
-              <Area type="monotone" dataKey="cumBudget" name="Budget" stroke="var(--blue)" strokeWidth={1.5} strokeDasharray="4 3" fill="url(#budgetGrad)" dot={false} />
-              <Area type="monotone" dataKey="cumSpent" name="Spent" stroke="var(--amber)" strokeWidth={2} fill="url(#spentGrad)" dot={false} />
-            </AreaChart>
+              <Bar dataKey="monthlySpend" name="Monthly Spend" fill="var(--amber)" opacity={0.85} radius={[2, 2, 0, 0]} />
+              <Line type="monotone" dataKey="remaining" name="Remaining" stroke="var(--blue)" strokeWidth={2} strokeDasharray="5 3" dot={false} connectNulls={false} />
+            </ComposedChart>
           </ResponsiveContainer>
         </div>
 
