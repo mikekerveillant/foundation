@@ -5,7 +5,7 @@ import PhilippinesMap from './PhilippinesMap';
 import OperationsLog from './OperationsLog';
 import WarehousePanel from './WarehousePanel';
 import TyphoonTimeline from './TyphoonTimeline';
-import { useIsMobile } from '../../hooks/useBreakpoint';
+import { useIsMobile, useIsShortScreen } from '../../hooks/useBreakpoint';
 import type { Warehouse, ActiveAlert, OpsLogEntry, Region, DeploymentState } from '../../types';
 
 // ── colour helpers ────────────────────────────────────────────────────────────
@@ -147,6 +147,8 @@ export default function DisasterRelief({ warehouses, alerts, regions, dataSource
   const [selectedWarehouseId, setSelectedWarehouseId] = useState<string | null>(null);
   const [deployments, setDeployments] = useState<DeploymentState[]>([]);
   const isMobile = useIsMobile();
+  const isShortScreen = useIsShortScreen();
+  const useCompactLayout = isMobile || isShortScreen;
 
   const alert = alerts[selectedAlertIdx] ?? alerts[0];
 
@@ -180,7 +182,7 @@ export default function DisasterRelief({ warehouses, alerts, regions, dataSource
       display: 'flex', alignItems: 'center', gap: 0, background: 'var(--bg-surface)',
       borderBottom: '1px solid var(--border)', padding: '0 12px', flexShrink: 0,
       overflowX: 'auto',
-      ...(isMobile ? { position: 'sticky', top: 0, zIndex: 10 } : {}),
+      ...(useCompactLayout ? { position: 'sticky', top: 0, zIndex: 10 } : {}),
     }}>
       {alerts.map((a, idx) => {
         const isActive = idx === selectedAlertIdx;
@@ -234,8 +236,9 @@ export default function DisasterRelief({ warehouses, alerts, regions, dataSource
     ? <TyphoonTimeline track={alert.track} lastUpdated={alert.lastUpdated} />
     : null;
 
-  // ── MOBILE: map fills screen — warehouse panel hidden (use desktop for detail) ──
-  if (isMobile) {
+  // ── COMPACT: portrait phone OR landscape phone (short screen < 500px tall) ──
+  // Map fills the screen; warehouse panel hidden to avoid blocking the view
+  if (useCompactLayout) {
     return (
       <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
         {tabBar}
