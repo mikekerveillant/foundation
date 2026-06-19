@@ -32,7 +32,7 @@ const PHIVOLCS_INTENSITY_COLOR: Record<string, string> = {
 };
 
 function disasterColor(alert: ActiveAlert): string {
-  if (alert.type === 'typhoon' || alert.type === 'tropical_storm') return SIGNAL_COLOR[alert.signalNumber];
+  if (alert.type === 'typhoon' || alert.type === 'tropical_storm' || alert.type === 'tropical_depression') return SIGNAL_COLOR[alert.signalNumber];
   if (alert.type === 'earthquake') return PHIVOLCS_INTENSITY_COLOR[alert.phivolcsIntensity ?? 'V'] ?? '#E8901C';
   if (alert.type === 'volcanic') return VOLCANO_LEVEL_COLOR[alert.volcanoAlertLevel ?? 0];
   return '#E8901C';
@@ -59,7 +59,7 @@ function disasterTypeLabel(type: ActiveAlert['type']): string {
 function AlertBanner({ alert, loading }: { alert: ActiveAlert; dataSource: 'live' | 'mock'; loading: boolean }) {
   const color = disasterColor(alert);
 
-  const badge = alert.type === 'typhoon' || alert.type === 'tropical_storm' ? (
+  const badge = alert.type === 'typhoon' || alert.type === 'tropical_storm' || alert.type === 'tropical_depression' ? (
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '5px 12px', background: `${color}18`, border: `1px solid ${color}40`, borderRadius: 6, flexShrink: 0 }}>
       <div style={{ fontFamily: 'var(--font-mono)', fontSize: 9, color, letterSpacing: '0.1em' }}>TCWS</div>
       <div style={{ fontFamily: 'var(--font-mono)', fontSize: 26, fontWeight: 700, color, lineHeight: 1 }}>{alert.signalNumber}</div>
@@ -76,7 +76,7 @@ function AlertBanner({ alert, loading }: { alert: ActiveAlert; dataSource: 'live
     </div>
   ) : null;
 
-  const subtitle = alert.type === 'typhoon' || alert.type === 'tropical_storm'
+  const subtitle = alert.type === 'typhoon' || alert.type === 'tropical_storm' || alert.type === 'tropical_depression'
     ? `TCWS ${SIGNAL_DESC[alert.signalNumber]} · ${alert.intensity}`
     : alert.type === 'earthquake'
     ? `PHIVOLCS Intensity ${alert.phivolcsIntensity} · Depth ${alert.depth} km · ${alert.intensity}`
@@ -216,7 +216,7 @@ export default function DisasterRelief({ warehouses, alerts, regions, dataSource
                 {disasterTypeLabel(a.type)}
               </span>
               {/* severity pill */}
-              {(a.type === 'typhoon' || a.type === 'tropical_storm') && (
+              {(a.type === 'typhoon' || a.type === 'tropical_storm' || a.type === 'tropical_depression') && (
                 <span style={{ fontFamily: 'var(--font-mono)', fontSize: 9, color, background: `${color}15`, border: `1px solid ${color}35`, padding: '1px 6px', borderRadius: 3 }}>
                   S{a.signalNumber}
                 </span>
