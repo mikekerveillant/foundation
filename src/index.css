@@ -210,7 +210,7 @@ body {
   html, body { overflow-x: hidden; }
 
   .app-layout {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0,1fr);
     grid-template-rows: var(--riskboard-height) minmax(0, 1fr);
     padding-bottom: var(--bottom-nav-height);
   }
