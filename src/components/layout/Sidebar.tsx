@@ -39,7 +39,7 @@ export default function Sidebar({ active, onChange }: Props) {
           letterSpacing: '0.02em',
           lineHeight: 1.1,
         }}>
-          FOUNDATION
+          Control Center
         </div>
         <div style={{
           fontFamily: 'var(--font-mono)',
